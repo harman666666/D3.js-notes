@@ -1,0 +1,3112 @@
+Simple Line Graph:
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style> /* set the CSS */
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+</style>
+<body>
+
+<!-- load the d3.js library -->    	
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// parse the date / time
+var parseTime = d3.timeParse("%d-%b-%y");
+
+// set the ranges
+var x = d3.scaleTime().range([0, width]);
+var y = d3.scaleLinear().range([height, 0]);
+
+// define the line
+var valueline = d3.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.close); });
+
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// Get the data
+d3.csv("data.csv", function(error, data) {
+  if (error) throw error;
+
+  // format the data
+  data.forEach(function(d) {
+      d.date = parseTime(d.date);
+      d.close = +d.close;
+  });
+
+  // Scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain([0, d3.max(data, function(d) { return d.close; })]);
+
+  // Add the valueline path.
+  svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("d", valueline);
+
+  // Add the X Axis
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  // Add the Y Axis
+  svg.append("g")
+      .call(d3.axisLeft(y));
+
+});
+
+</script>
+</body>
+data.csv#
+
+date,close
+1-May-12,58.13
+30-Apr-12,53.98
+27-Apr-12,67.00
+26-Apr-12,89.70
+25-Apr-12,99.00
+24-Apr-12,130.28
+23-Apr-12,166.70
+20-Apr-12,234.98
+19-Apr-12,345.44
+18-Apr-12,443.34
+17-Apr-12,543.70
+16-Apr-12,580.13
+13-Apr-12,605.23
+12-Apr-12,622.77
+11-Apr-12,626.20
+10-Apr-12,628.44
+9-Apr-12,636.23
+5-Apr-12,633.68
+4-Apr-12,624.31
+3-Apr-12,629.32
+2-Apr-12,618.63
+30-Mar-12,599.55
+29-Mar-12,609.86
+28-Mar-12,617.62
+27-Mar-12,614.48
+26-Mar-12,606.98
+
+
+
+Dynamic D3:
+
+///////////////////////////
+D3 Mutating arrays
+
+JavaScript includes mutation methods that modify the array:
+
+array.pop - Remove the last element from the array.
+array.push - Add one or more elements to the end of the array.
+array.reverse - Reverse the order of the elements of the array.
+array.shift - Remove the first element from the array.
+array.sort - Sort the elements of the array.
+array.splice - Add or remove elements from the array.
+array.unshift - Add one or more elements to the front of the array.
+There are also access methods that return some representation of the array:
+
+array.concat - Join the array with other array(s) or value(s).
+array.join - Join all elements of the array into a string.
+array.slice - Extract a section of the array.
+array.indexOf - Find the first occurrence of a value within the array.
+array.lastIndexOf - Find the last occurrence of a value within the array.
+And finally iteration methods that apply functions to elements in the array:
+
+array.filter - Create a new array with only the elements for which a predicate is true.
+array.forEach - Call a function for each element in the array.
+array.every - See if every element in the array satisfies a predicate.
+array.map - Create a new array with the result of calling a function on every element in the array.
+array.some - See if at least one element in the array satisfies a predicate.
+array.reduce - Apply a function to reduce the array to a single value (from left-to-right).
+array.reduceRight - Apply a function to reduce the array to a single value (from right-to-left).
+
+
+//////////////////////////
+
+
+
+
+Randomly Color Paragraphs:
+
+d3.selectAll("p").style("color", function() {
+  return "hsl(" + Math.random() * 360 + ",100%,50%)";
+});
+
+To alternate shades of gray for even and odd nodes:
+
+d3.selectAll("p").style("color", function(d, i) {
+  return i % 2 ? "#fff" : "#eee";
+});
+
+If you bind an array of numbers to paragraph elements, you can use these numbers to compute dynamic font sizes:
+
+d3.selectAll("p")
+  .data([4, 8, 15, 16, 23, 42])
+    .style("font-size", function(d) { return d + "px"; });
+
+Using D3’s enter and exit selections, you can create new nodes
+ for incoming data and remove outgoing nodes that are no longer needed.
+
+When data is bound to a selection, each element in the data array is paired with the
+ corresponding node in the selection. If there are fewer nodes than data, the extra data 
+ elements form the enter selection, which you can instantiate by appending to the enter selection. For example:
+
+d3.select("body")
+  .selectAll("p")
+  .data([4, 8, 15, 16, 23, 42])
+  .enter().append("p")
+    .text(function(d) { return "I’m number " + d + "!"; });
+
+Updating nodes are the default selection—the result of the data operator. Thus, if you forget
+ about the enter and exit selections, you will automatically select only the elements for which there
+  exists corresponding data. A common pattern is to break the initial selection into three parts: the updating 
+  nodes to modify, the entering nodes to add, and the exiting nodes to remove.
+
+// Update…
+var p = d3.select("body")
+  .selectAll("p")
+  .data([4, 8, 15, 16, 23, 42])
+    .text(function(d) { return d; });
+
+// Enter…
+p.enter().append("p")
+    .text(function(d) { return d; });
+
+// Exit…
+p.exit().remove();
+
+Transitions
+
+D3’s focus on transformation extends naturally to animated transitions. Transitions 
+gradually interpolate styles and attributes over time. Tweening can be controlled via 
+easing functions such as “elastic”, “cubic-in-out” and “linear”. D3’s interpolators 
+support both primitives, such as numbers and numbers embedded within strings (font sizes, 
+path data, etc.), and compound values. You can even extend D3’s interpolator registry 
+to support complex properties and data structures.
+
+For example, to fade the background of the page to black:
+
+d3.select("body").transition()
+    .style("background-color", "black");
+Or, to resize circles in a symbol map with a staggered delay:
+
+d3.selectAll("circle").transition()
+    .duration(750)
+    .delay(function(d, i) { return i * 10; })
+    .attr("r", function(d) { return Math.sqrt(d * scale); });
+
+By modifying only the attributes that actually change, D3 reduces overhead and allows 
+greater graphical complexity at high frame rates. D3 also allows sequencing of complex 
+transitions via events. And, you can still use CSS3 transitions; D3 does not replace
+ the browser’s toolbox, but exposes it in a way that is easier to use.
+
+/////////////////////////////////////////////////////////////////////////////////
+ A bar chart in D3JS:
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.bar {
+  fill: steelblue;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+</style>
+<svg class="chart"></svg>
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script>
+
+var margin = {top: 20, right: 30, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var chart = d3.select(".chart")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("data.tsv", type, function(error, data) {
+  x.domain(data.map(function(d) { return d.name; }));
+  y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+  chart.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  chart.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
+  chart.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.name); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); })
+      .attr("width", x.rangeBand());
+});
+
+function type(d) {
+  d.value = +d.value; // coerce to number
+  return d;
+}
+
+</script>
+
+////////////////////////////////////////////////////////////////////////////////
+REACT AND D3JS
+
+And so, react-faux-dom was born. A fake DOM with enough methods to trick D3, including 
+a selector engine and partial support for addEventListener etc. (addEventListener sets 
+the appropriate prop value, so if you add two, it will overwrite the first, I may improve this later)
+
+You can use the full D3 API (no special React methods), inspect it with React developer tools,
+ have efficient D3 components without carefully placed .enter() / .exit() calls, use React animation 
+ techniques instead of D3s (good and bad, both approaches work well) as well as render on the server
+  side. Yeah, buzzword time, this will allow you to have isomorphic charts.
+
+One way to do that is to use react-faux-dom. This library allows to create a fake DOM, to manipulate 
+it with D3, and then to transform it into a React component. One of the benefits of using this library 
+is to be able to use the full D3 API without changing the original syntax while respecting React’s 
+approach: using a virtual DOM to render elements. So basically you could just copy some code using 
+D3, paste it into a React component using react-faux-dom and it should work.
+
+However the first time I used react-faux-dom to render this frequency chart nothing rendered. 
+So I wanted to share with you these two mistakes to avoid if you want to use react-faux-dom:
+The first way to use react-faux-dom is to use React.createClass with react-faux-dom core mixin. 
+In this case make sure to have a default value set for this.state.chart, otherwise your component won’t render:
+
+function render() {
+  var list = ReactFauxDOM.createElement('ul')
+ 
+  d3.select(list)
+    .selectAll('li')
+    .data(this.props.data) // 1, 2, 3...
+    .enter()
+    .append('li')
+    .text(function (d) {
+      return d
+    })
+ 
+  return list.toReact()
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+USING REACT WITH D3JS:
+
+// Using d3 v.4.x 
+
+var React = require('react')
+var ReactFauxDOM = require('react-faux-dom')
+var d3 = require('d3')
+ 
+class FrequencyChart extends React.Component {
+
+  constructor(props) {
+    super(props);
+  }
+
+  drawChart() {
+
+    const div = new ReactFauxDOM.createElement('div');
+
+    let data = this.props.data
+ 
+    let margin = {top: 20, right: 20, bottom: 30, left: 40},
+      width = this.props.width - margin.left - margin.right,
+      height = this.props.height - margin.top - margin.bottom;
+ 
+    let x = d3.scaleBand()
+      .rangeRound([0, width])
+ 
+    let y = d3.scaleLinear()
+      .range([height, 0])
+ 
+    let xAxis = d3.axisBottom()
+      .scale(x)
+ 
+    let yAxis = d3.axisLeft()
+      .scale(y)
+      .ticks(10, "%");
+     
+    //Pass it to d3.select and proceed as normal
+    let svg = d3.select(div).append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+ 
+    x.domain(data.map((d) => d.letter));
+    y.domain([0, d3.max(data, (d) => d.frequency)]);
+ 
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis);
+ 
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Frequency");
+ 
+    svg.selectAll(".bar")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", (d) => x(d.letter))
+      .attr("width", 20)
+      .attr("y", (d) => y(d.frequency))
+      .attr("height", (d) => {return height - y(d.frequency)});
+ 
+    //DOM manipulations done, convert to React
+    return div.toReact()
+  }
+ 
+  render () {
+     //check if props update works
+    console.log(this.props.color);
+    return this.drawChart();
+  }
+}
+
+module.exports = FrequencyChart;
+
+/////////////////////////////////////////////////////////////////////////////
+
+SELECTING:
+
+<div>
+  <p>Normal paragraph</p>
+
+  <p class="red">Red paragraph</p>
+</div>
+
+<ol>
+  <li id="some-id">Unique element</li>
+  <li>Another list element</li>
+  <li>
+    <p>Paragraph inside list element</p>
+    <p>Second paragraph</p>
+  </li>
+</ol>
+
+
+
+
+// D3 Selection API
+d3.select('p').size(); // select() only finds one
+// 1
+d3.selectAll('p').size(); // selectAll() finds all
+// 4
+var reds = d3.selectAll('.red');
+// [ > Array[1] ]
+reds.text();
+// "Red paragraph"
+
+Here are some examples of adding listeners to the click, mouseover 
+and mouseleave events. D3 has some nice helper methods for working with events as well.
+
+<h1 id="click-me">
+  Click on me!
+</h1>
+
+<p class="hover-me">
+  Hover over me!
+</p>
+
+<p class="hover-me">
+  OK now hover over here!
+</p>
+
+<p class="hover-me">
+  Hover here too!
+</p>
+    
+// DOM API
+var clickMe = document.getElementById('click-me');
+clickMe.onclick = function() {
+  if (this.style.backgroundColor) {
+    this.style.backgroundColor = '';
+  } else {
+    this.style.backgroundColor = 'red';
+  }
+}
+
+// D3 Selection API. Note: it attaches the
+// callbacks to each element in the selection
+d3.selectAll('.hover-me')
+  .on('mouseover', function() {
+    this.style.backgroundColor = 'yellow';
+  })
+  .on('mouseleave', function() {
+    this.style.backgroundColor = '';
+  });
+
+  Even CSS styles and selectors can apply to SVG elements. 
+  The CSS attribute names for SVG come from the SVG definition, s
+  o they are sometimes different from their HTML brethren. (For 
+  example, to change the background color of a div to red you 
+  would select it then set background-color: red but to get the
+   same effect on an SVG rectangle you would instead use the attribute 
+   fill: red since an SVG rect doesn’t respond to background-color for styling.)
+
+SVG defines tags for lots of basic shapes, like <rect> and <circle> and <line>.
+
+<svg width="300" height="180">
+  <circle cx="30"  cy="50" r="25" />
+  <circle cx="90"  cy="50" r="25" class="red" />
+  <circle cx="150" cy="50" r="25" class="fancy" />
+
+  <rect x="10"  y="80" width="40" height="40"
+    fill="steelBlue" />
+  <rect x="70"  y="80" width="40" height="40"
+    style="fill: steelBlue" />
+  <rect x="130" y="80" width="40" height="40"
+    class="fancy" />
+</svg>
+    
+.red {
+  fill: red; /* not background-color! */
+}
+
+.fancy {
+  fill: none;
+  stroke: black; /* similar to border-color */
+  stroke-width: 3pt; /* similar to border-width */
+  stroke-dasharray: 3,5,10;
+}
+
+Where HTML has the <div> and <span> tags, SVG has the <g> tag for an arbitrary group. 
+You’ll see <g> a lot in D3 examples. They’re great for applying styles to a group 
+(including re-positioning the groups).
+
+The <text> tag is good for simple labels. The <path> tag is powerful but complex, it can
+ be used for either lines or arbitrary filled-in shapes depending on the styling.
+
+<svg width="300" height="180">
+  <g transform="translate(5, 15)">
+    <text x="0" y="0">Howdy!</text>
+  </g>
+
+  <g transform="translate(5, 55)">
+    <!-- M: move to (jump)
+         L: line to
+         Q: curve to (quadratic) -->
+    <path d="M0,50 L50,0 Q100,0 100,50"
+      fill="none" stroke-width="3" stroke="black" />
+  </g>
+
+  <g transform="translate(5, 105)">
+    <!-- C: curve to (cubic)
+         Z: close shape -->
+    <path d="M0,100 C0,0 25,0 125,100 Z" fill="black" />
+  </g>
+</svg>
+    
+///////////////////////////////////////////////////////////////////////////////////
+
+Scatter Plot SVG
+
+<svg width="350" height="160">
+  <!-- 60px x 10px margin -->
+  <g class="layer" transform="translate(60,10)">
+    <!-- cx = 270px * ($X / 3)
+                ^      ^   ^
+    width of graph  x-value max(x)
+
+          cy = 120px - (($Y / 80) * 120px)
+                 ^       ^     ^       ^
+      top of graph   y-value  max(y)  scale -->
+    <circle r="5" cx="0"   cy="105" />
+    <circle r="5" cx="90"  cy="90"  />
+    <circle r="5" cx="180" cy="60"  />
+    <circle r="5" cx="270" cy="0"   />
+
+    <g class="y axis">
+      <line x1="0" y1="0" x2="0" y2="120" />
+      <text x="-40" y="105" dy="5">$10</text>
+      <text x="-40" y="0"   dy="5">$80</text>
+    </g>
+    <g class="x axis" transform="translate(0, 120)">
+      <line x1="0" y1="0" x2="270" y2="0" />
+      <text x="-30"   y="20">January 2014</text>
+      <text x="240" y="20">April</text>
+    </g>
+  </g>
+</svg>
+
+    Man! All that work for such a simple graph? SVG is a lot of work!
+
+////////////////////////////////////////////////////////////////////////////////////
+THE D3 WAY
+/////////////////////////////////////////////////////////////////////////////////////
+
+In D3, our source data is always plain old Javascript objects (POJOs). 
+Most often the data is homogenous arrays.
+
+var numbers = [ 5, 4, 10, 1 ],
+    data = [
+      { date: '2014-01-01', amount: 10 },
+      { date: '2014-02-01', amount: 20 },
+      { date: '2014-03-01', amount: 40 },
+      { date: '2014-04-01', amount: 80 }
+    ];
+
+d3.min(numbers);
+// 1
+    
+In D3 code, it’s common to pass callbacks that are used on all elements of a group. 
+These callbacks are almost always called back with two arguments: the element and 
+its index. It’s common to name these parameters d and i respectively.
+
+d3.max(data, function(d, i) { return d.amount });
+// 80
+
+d3.extent(numbers);
+// [1, 10]
+
+var y = d3.scaleLinear()
+  .domain([0, 80]) // $0 to $80
+  .range([200, 0]); // Seems backwards because SVG is y-down
+
+y.domain(d3.extent(data, function(d) { return d.amount }));
+    
+We can even do the same things with dates!
+
+var x = d3.scaleTime()
+    .domain([
+      new Date(Date.parse('2014-01-01')),
+      new Date(Date.parse('2014-04-01'))
+    ])
+    .range([0, 300]);
+
+x(new Date(Date.parse('2014-02-01')));
+// 103.3811949976841
+
+Axes:
+
+// x is the d3.scaleTime()
+var xAxis = d3.axisBottom(x)
+  .ticks(4); // specify the number of ticks
+
+var svg = d3.select('body')
+  .append('svg')        // create an <svg> element
+    .attr('width', 300) // set its dimentions
+    .attr('height', 150);
+
+svg.append('g')            // create a <g> element
+  .attr('class', 'x axis') // specify classes
+  .call(xAxis);            // let the axis do its thing
+
+
+http://square.github.io/intro-to-d3/data-binding/    
+
+/////////////////////
+DATA binding
+
+D3 selections are a different way to look at data binding. They’re powerful 
+because the same selection can be updated for different data later on. 
+Updating is the most powerful part of selections.
+
+Ok, so we’ve referenced d3.select() and d3.selectAll() a few times 
+already but now, it’s really time to dig in. d3.select() will find one element, 
+d3.selectAll will match all available elements.
+
+With types, the functions might look something like:
+
+d3.select(String selector) -> (d3.selection)
+
+D3 selections are a group of elements that match a query or could
+ match a query later (the elements may not have been constructed yet).
+
+ create a selection and use .data() to bind our data to the selection.
+
+<!-- after, rects graph -->
+<svg>
+  <rect /><!-- { product: 'Hoodie',  count: 7 } -->
+  <rect /><!-- { product: 'Jacket',  count: 6 } -->
+  <rect /><!-- { product: 'Snuggie', count: 9 } -->
+</svg>
+    
+
+var svg = d3.select('svg');
+svg.size();
+// 1 -- one <svg> element exists
+
+var rects = svg.selectAll('rect')
+  .data(sales);
+
+rects.size();
+// 0 -- no <rect> elements exist yet!
+
+Okay, now we have a selection but still no elements! We have more work to do.
+
+Adding Elements selection.enter()
+
+Again, our goal is to have a rectangle for each data point. We are starting 
+with none and we have 4 new data points, so obviously the right thing to 
+do is to add a new <rect> for each data point.
+
+The way D3 looks at this is a more subtle: we want to add a <rect> per data point, 
+but only for the new points since the last data join. Since this is the first data
+ binding (there are no rects currently), everything is new, it’s straightforward to 
+ add new points. It’s important to keep in mind that for the next selection, 
+ things will be more complex since there will already be rects.
+
+The part of a D3 selection that represents these element-less data-points is selection.enter();
+
+var newRects = rects.enter();
+    
+So now newRects represents these element-less data-points, so we use append to add new 
+elements. The elements don’t add themselves, we have to create the elements that will 
+match the selection ourselves. We use the same attribute editing 
+helpers to configure each circle per its data point.
+
+// recall that scales are functions that map from
+// data space to screen space
+var maxCount = d3.max(sales, function(d, i) {
+  return d.count;
+});
+var x = d3.scaleLinear()
+  .range([0, 300])
+  .domain([0, maxCount]);
+var y = d3.scaleOrdinal()
+  .rangeRoundBands([0, 75])
+  .domain(sales.map(function(d, i) {
+    return d.product;
+  }));
+
+newRects.append('rect')
+  .attr('x', x(0))
+  .attr('y', function(d, i) {
+    return y(d.product);
+  })
+  .attr('height', y.rangeBand())
+  .attr('width', function(d, i) {
+    return x(d.count);
+  });
+    
+  We're getting a little sneaky here! We're introducing an ordinal scale, 
+  one that's discrete instead of continuous.
+The d3.scaleOrdinal() helps us create buckets for each element. 
+In this case, that's one per product.
+
+The domain is the 3 product names. The range is a little different, rangeRoundBands 
+is a helper function that sets the range, but tells D3 to pick 
+buckets that are whole pixel widths (no fractions).  
+
+Removing Elements selection.exit()
+
+Where selection.enter() selects elements that have added since the last data join, 
+selection.exit() is the opposite, it applies to elements that have been removed.
+
+Suppose we drop the first point from our source array, we can find and 
+operate on the corresponding element in the DOM via selection.exit().
+
+We can use the remove() method to immediately delete matched elements, it’s the opposite of append().
+
+sales.pop(); // drops the last element
+
+var rects = rects.data(sales); // join the data again
+
+var rectsToRemove = rects.exit();
+
+rectsToRemove.size()
+// 1 -- one element is part of the exit selection
+
+rectsToRemove.remove(); // instantly removes
+
+////////////////////////////////////////////////////////////////////////////    
+Identity and the Key Function
+
+As a quick aside: Javascript object equality is very shallow. Objects are only equal if 
+they are actually the same object (identity), not if they have the same values:
+
+var obj1 = { value: 1 };
+// true -- identity
+obj1 == obj1;
+
+var obj2 = { value: 2 };
+var obj3 = { value: 2 };
+// false -- huh? they have the same values!
+obj2 == obj3;
+    
+But the example with selection.exit() above works! It only removed one element from the 
+DOM because we only removed one element from the array, 
+and all the rest of the objects were the exact same.
+
+What if we get a new page of data, with some overlap, but we no longer have the 
+exact same object instances? Well, we will have to find some way to match objects 
+to each other, and with D3, that’s where a key function comes in.
+
+When we introduced selection.data() earlier, we left out the hidden second 
+parameter, the key function. It’s another (d, i) callback.
+
+This example keys objects on their date, so we can match elements across separate arrays.
+
+var sales1 = [
+  { product: 'Hoodie', count: 7 },
+  { product: 'Jacket', count: 6 }
+];
+
+var sales2 = [
+  { product: 'Jacket',  count: 6 }, // same
+  { product: 'Snuggie', count: 9 }  // new
+];
+
+var rects = svg.selectAll('rect')
+  .data(sales1, function(d, i) { return d.product; } );
+
+rects.enter().append('rect');
+
+rects.size();
+// 2 -- first join, adds two new elements
+
+var nextrects = rects
+  .data(sales2, function(d, i) { return d.product; });
+
+nextrects.exit().size();
+// 1 -- one element to remove
+nextrects.exit().remove();
+
+nextrects.enter().append('rect'); // adds one element
+    
+Transitions selection.transition()
+
+The key function is also important in case parts of our objects change – 
+if we change a count, then we can update the appropriate element without 
+having to delete and re-add the element, we can update it in place.
+One of D3’s most visually pleasing features is its ability to help with 
+transitions. The key function is critical here for object permanence.
+Suppose we have per-product sales we want to update as more products are 
+sold? We can use transitions to demonstrate this update.
+
+Day 1
+Product	Sales (Cumulative)
+Hoodie	10
+Jacket	3
+Snuggie	2
+
+Day 2
+Product	Sales (Cumulative)
+Hoodie	16
+Jacket	7
+Snuggie	8
+
+function toggle() {
+  sales = (sales == days[0]) ? days[1] : days[0];
+  update();
+}
+
+function update() {
+  var rects = svg.selectAll('rect')
+    .data(sales, function(d, i) { return d.product });
+
+  // When we enter, we add the DOM element
+  // and set up the things that won't change
+  var enterRects = rects.enter()
+    .append('rect')
+      .attr('x', x(0))
+      .attr('y', function(d, i) {
+        return y(d.product);
+      })
+      .attr('height', y.bandwidth())
+
+  // "rects" represents the update selection, we need to
+  // manually merge it with the enter selection to update
+  // all rects at the same time
+  rects.merge(enterRects)
+    .attr('width', function(d, i) {
+      return x(d.count);
+    });
+};
+
+Ok, but now time to make it pretty. That’s where selection.transition() comes in. 
+In the above example, we were just using the plain update selection to change the 
+values. Here, we’ll use transition() to make our transition much slicker.
+
+transition() selections can have custom timing attributes like 
+.duration() and .delay() and even a custom easing function .ease(), 
+but the defaults are pretty nice.
+
+function toggle() {
+  sales = (sales == days[0]) ? days[1] : days[0];
+  update();
+}
+
+function update() {
+  var rects = svg.selectAll('rect')
+    .data(sales, function(d, i) { return d.product });
+
+  var enterRects = rects.enter()
+    .append('rect')
+      .attr('x', x(0))
+      .attr('y', function(d, i) {
+        return y(d.product);
+      })
+      .attr('height', y.bandwidth())
+      .attr('width', function(d, i) {
+        return x(d.count);
+      });
+
+  rects.merge(enterRects)
+    .transition() // NEW
+    .duration(1000) // Also NEW
+      .attr('width', function(d, i) {
+        return x(d.count);
+      });
+};
+
+//////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
+Some of these examples make use of D3’s layout helpers.
+
+Some layouts convert our original data into descriptions of the shapes we want 
+to draw. For example, the pie layout converts numbers into arcs (start and end
+ angles for pie slices). This keeps our drawing code simple. Other layouts help us 
+ group our data so we can draw useful shapes like stacked stacked or trees.
+
+D3 also provides helpers to make some of the more complex SVG shapes easier to draw. 
+The path helper can build curves that interolate between data points. The arc 
+helper can take the angles generated by the pie layout and draw arcs (pie slices).
+
+Let’s start out by walking through using D3 to draw a simple pie chart.
+
+First we get our source data:
+
+var sales = [
+  { product: 'Hoodie',  count: 12 },
+  { product: 'Jacket',  count: 7 },
+  { product: 'Snuggie', count: 6 },
+];
+    
+We want each product to be represented as a pie slice in our pie chart, 
+which involves calculating the associated angles. We’ll use the d3.pie helper for that:
+
+var pie = d3.pie()
+  .value(function(d) { return d.count })
+
+var slices = pie(sales);
+// the result looks roughly like this:
+[
+  {
+    data: sales[0],
+    endAngle: 3.0159289474462017,
+    startAngle: 0,
+    value: 12
+  },
+  {
+    data: sales[1],
+    startAngle: 3.0159289474462017,
+    endAngle: 4.775220833456486,
+    value: 7
+  },
+  {
+    data: sales[2],
+    startAngle: 4.775220833456486,
+    endAngle: 6.283185307179587,
+    value: 6
+  }
+]
+
+Now we have our data in angles (radians), so we can turn them into something visual. 
+The next tool D3 gives us is the d3.arc which helps to create SVG <path> tags for arcs. 
+This is where we provide all the information relevant 
+to actually drawing, such as the radius size.
+
+var arc = d3.arc()
+  .innerRadius(0)
+  .outerRadius(50);
+
+// helper that returns a color based on an ID
+var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+var svg = d3.select('svg.pie');
+var g = svg.append('g')
+  .attr('transform', 'translate(200, 50)')
+
+g.selectAll('path.slice')
+  .data(slices)
+    .enter()
+      .append('path')
+        .attr('class', 'slice')
+        .attr('d', arc)
+        .attr('fill', function(d) {
+          return color(d.data.product);
+        });
+
+// building a legend is as simple as binding
+// more elements to the same data. in this case,
+// <text> tags
+svg.append('g')
+  .attr('class', 'legend')
+    .selectAll('text')
+    .data(slices)
+      .enter()
+        .append('text')
+          .text(function(d) { return '• ' + d.data.product; })
+          .attr('fill', function(d) { return color(d.data.product); })
+          .attr('y', function(d, i) { return 20 * (i + 1); })
+
+Again, we snuck in a new helper, and it's another type of ordinal scale.
+The d3.scaleOrdinal helper gives us back a function. This function takes 
+in values (typically IDs) and gives back a value in its domain. The same 
+ID gets the same color, and it will rotate through its domain. apart. We initalize 
+it with d3.schemeCategory10 which is a list of10 colors that are pretty easy to tell apart.
+
+//////////////////////////////////////////////////////
+///////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+One of the most common charts to draw is some variation of stacked bars. These 
+are deceptively complex, because after the first layer, each new 
+layer of bars depends on layout of the previous one.
+
+The data requirements are also different because stacked bars need to have dense data sources. 
+In most graphs, we could omit an empty value because it won’t be drawn, but in a stacked 
+layout, that still could affect the layout of the next layer.
+
+var sales = [
+  { date: "2014-01-01", hoodies: 6, jackets: 2, snuggies: 3 },
+  { date: "2014-01-02", hoodies: 7, jackets: 5, snuggies: 2 },
+  { date: "2014-01-03", hoodies: 8, jackets: 7, snuggies: 3 }
+];
+
+Now we can take advantage of the d3.stack to do the work of stacking our layers on top each other. 
+While normally a bar graph would have one y value, a stacked one has two:
+
+where a segment starts (“baseline”)
+where the segment ends
+
+For the first layer stacked bar chart (at the bottom), the baseline is typically 0. 
+It can be other values for things like streamgraphs, which are a whole other topic.
+
+var stack = d3.stack()
+  .keys(["hoodies", "jackets", "snuggies"])
+
+var stacked = stack(sales);
+
+Now, stacked will be a set of nested arrays containing the hights of the data in 
+sales, stacked, which will come in handy when it’s time to draw these. 
+For examples, the stacked data now looks like this:
+
+stacked
+[
+  [[0, 6],  [0, 7],   [0, 8  ]],
+  [[6, 8],  [7, 12],  [8, 15 ]],
+  [[8, 11], [12, 14], [15 18 ]]
+]
+
+But the data is not a plain array! It also has a few useful properties. The 
+“rows” have key and index and the computed start/end arrays 
+also have data – the original data.
+
+stacked
+// [Array[3], Array[3], Array[3]]
+stacked[0]
+// [Array[2], Array[2], Array[2]]
+Object.keys(stacked[0])
+// ["0", "1", "2", "key", "index"]
+stacked[0].key
+// "hoodies"
+stacked[0][0].data
+// {date: "2014-01-01", hoodies: 6, jackets: 2, snuggies: 3}   
+    
+Ok so let’s get to drawing! We’ll bring back our good friends d3.scaleLinear and d3.scaleTime.
+
+var height = 200;
+var width = 200;
+
+// we need to calculate the maximum y-value
+// across all our layers, so we find the biggest
+// end value
+var maxY = d3.max(stacked, function(d) {
+  return d3.max(d, function(d) {
+    return d[1];
+  });
+});
+
+var y = d3.scaleLinear()
+  .range([height, 0])
+  .domain([0, maxY]);
+
+var x = d3.scaleTime()
+  .range([0, width])
+  .domain(d3.extent(sales, function(d) {
+    return new Date(Date.parse(d.date));
+  }))
+  .nice(4);
+
+var svg = d3.select('svg.stack');
+var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+// bind a <g> tag for each layer
+var layers = svg.selectAll('g.layer')
+  .data(stacked, function(d) { return d.key; })
+    .enter()
+      .append('g')
+        .attr('class', 'layer')
+        .attr('fill', function(d) { return color(d.key); })
+
+// bind a <rect> to each value inside the layer
+layers.selectAll('rect')
+  .data(function(d) { return d; })
+  .enter()
+    .append('rect')
+      .attr('x', function(d) { return x(new Date(Date.parse(d.data.date))); })
+      .attr('width', width / 3)
+      .attr('y', function(d) {
+        // remember that SVG is y-down while our graph is y-up!
+        // here, we set the top-left of this bar segment to the
+        // larger value of the pair
+        return y(d[1]);
+      }).attr('height', function(d) {
+        // since we are drawing our bar from the top downwards,
+        // the length of the bar is the distance between our points
+        return y(d[0]) - y(d[1]);
+      });
+    
+There are a few things that make this graph a little more complex. One of the 
+hardest parts is realizing that D3 is really only going to hint at how we should 
+stack the bars: D3 gives us stacked results in our data space, but not in SVG's 
+coordinate system. We have to deal with the same confusing Y-axis coordinate flip.
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+D3 JS OPENING CSV, JSON, ETC:
+
+
+Film,Genre,Lead Studio,Audience score %,Worldwide Gross,Year
+27 Dresses,Comedy,Fox,71,160.308654,2008
+(500) Days of Summer,Comedy,Fox,81,60.72,2009
+A Dangerous Method,Drama,Independent,89,8.972895,2011
+A Serious Man,Drama,Universal,64,30.68,2009
+Across the Universe,Romance,Independent,84,29.367143,2007
+Beginners,Comedy,Independent,80,14.31,2011
+we can request it using:
+
+d3.csv('films.csv', function(err, data) {
+  // Do something with the data
+})
+D3 transforms the CSV data into an array of objects:
+
+[
+  {
+    "Film": "27 Dresses",
+    "Genre": "Comedy",
+    "Lead Studio": "Fox",
+    "Audience score %": "71",
+    "Worldwide Gross": "160.308654",
+    "Year": "2008"
+  },
+  {
+    "Film": "(500) Days of Summer",
+    "Genre": "Comedy",
+    "Lead Studio": "Fox",
+    "Audience score %": "81",
+    "Worldwide Gross": "60.72",
+    "Year": "2009"
+  },
+  {
+    "Film": "A Dangerous Method",
+    "Genre": "Drama",
+    "Lead Studio": "Independent",
+    "Audience score %": "89",
+    "Worldwide Gross": "8.972895",
+    "Year": "2011"
+  },
+  {
+    "Film": "A Serious Man",
+    "Genre": "Drama",
+    "Lead Studio": "Universal",
+    "Audience score %": "64",
+    "Worldwide Gross": "30.68",
+    "Year": "2009"
+  },
+  {
+    "Film": "Across the Universe",
+    "Genre": "Romance",
+    "Lead Studio": "Independent",
+    "Audience score %": "84",
+    "Worldwide Gross": "29.367143",
+    "Year": "2007"
+  },
+  {
+    "Film": "Beginners",
+    "Genre": "Comedy",
+    "Lead Studio": "Independent",
+    "Audience score %": "80",
+    "Worldwide Gross": "14.31",
+    "Year": "2011"
+  }
+]
+Notice that D3 has used the CSV column names (Film, Genre, Lead Studio etc.) as property names for each object.
+
+D3 provides a number of layouts which are functions that help transform your data into a visual layout. 
+For example, if we have hierarchical (or tree shaped) data, we can use layouts to create a tree view:
+a packed circle view (with leaf nodes sized by revenue):
+and a treemap:
+
+
+/////////////////////////////////////////////////////
+
+From Selections to Shapes:
+
+For example, given 5 circles:
+we can use d3.selectAll to select the circles and .style and .attr to modify them:
+
+d3.selectAll('circle')
+  .style('fill', 'orange')
+  .attr('r', function() {
+    return 10 + Math.random() * 40;
+  });
+
+
+D3 has two functions to make selections d3.select and d3.selectAll.
+d3.select selects the first matching element whilst d3.selectAll selects all 
+matching elements. Each function takes a single argument 
+which specifies the selector string.
+
+For example to select all elements with class item use d3.selectAll('.item').
+
+Once we’ve made a selection we can modify the elements in it using the following functions:
+
+Name	        Behaviour	                                                                          Example
+.style      	Update the style	                                                d3.selectAll('circle').style('fill', 'red')
+.attr	        Update an attribute	                                                d3.selectAll('rect').attr('width', 10)
+.classed	    Add/remove a class attribute	                                    d3.select('.item').classed('selected', true)
+.property	    Update an element's property	                                      d3.selectAll('.checkbox').property('checked', false)
+.text	        Update the text content	                                                d3.select('div.title').text('My new book')
+.html	        Change the html content	                              d3.select('.legend').html('<div class="block"></div><div>0 - 10</div>')
+
+n addition to passing constant values such as red, 10 and 
+true to .style, .attr, .classed, .property, .text and .html we can pass in a function:
+
+d3.selectAll('circle')
+  .attr('cx', function(d, i) {
+    return i * 100;
+  });
+The function typically accepts two arguments d and i. The first argument 
+d is the joined data (see the data joins section) and i is the 
+index of the element within the selection.
+
+If we want to update elements in a selection according to their 
+position within the selection, we can use the i argument. 
+For example to position some rect elements horizontally we can use:
+
+d3.selectAll('rect')
+  .attr('x', function(d, i) {
+    return i * 40;
+  });
+
+
+We can add event handlers to selected elements using .on which expects a 
+callback function into which is passed two arguments d and i. As before, 
+d is the joined data (see the data joins section) and i 
+is the index of the element within the selection.)
+
+The most common events include (see MDN event reference for more details):
+
+Event name	Description
+click	                    Element has been clicked
+mouseenter	              Mouse pointer has moved onto the element
+mouseover               	Mouse pointer has moved onto the element or its children
+mouseleave	              Mouse pointer has moved off the element
+mouseout                	Mouse pointer has moved off the element or its children
+mousemove	                Mouse pointer has moved over the element
+
+Let’s set up an event handler to update a status element with the index of the clicked element:
+
+d3.selectAll('circle')
+  .on('click', function(d, i) {
+    d3.select('.status')
+      .text('You clicked on circle ' + i);
+  });
+
+In the event callback function the this variable is bound to the DOM element. 
+This allows us to do things such as:
+
+d3.selectAll('circle')
+  .on('click', function(d, i) {
+    d3.select(this)
+      .style('fill', 'orange');
+  });
+
+  Note that this is a DOM element and not a D3 selection 
+  so if we wish to modify it using D3 we must first 
+  select it using d3.select(this).
+
+Elements can be added to a selection using .append and .insert 
+whilst elements can be removed using .remove.
+
+.append appends an element to the children of each element in the selection. 
+The first argument specifies the type of element.
+
+As an example let’s start with 3 g elements, each containing a circle:
+
+<g class="item" transform="translate(0, 0)">
+  <circle r="40" />
+</g>
+<g class="item" transform="translate(120, 0)">
+  <circle r="40" />
+</g>
+<g class="item" transform="translate(240, 0)">
+  <circle r="40" />
+</g>
+
+We can append a text element to each using:
+
+d3.selectAll('g.item')
+  .append('text')
+  .text(function(d, i) {
+    return i + 1;
+  });
+resulting in a text being added to each g.item:
+
+<g class="item" transform="translate(0, 0)">
+  <circle r="40" />
+  <text>1</text>
+</g>
+<g class="item" transform="translate(120, 0)">
+  <circle r="40" />
+  <text>2</text>
+</g>
+<g class="item" transform="translate(240, 0)">
+  <circle r="40" />
+  <text>3</text>
+</g>
+
+.append is commonly used in the context of enter/exit where it has different behaviour.)
+
+.insert is similar to .append but it allows us to specify a before element 
+to which, you guessed it, the new element is attached.
+
+Therefore if we run the same example again, but choosing to 
+insert the text element before the circle element we get:
+
+d3.selectAll('g.item')
+  .insert('text', 'circle')
+  .text(function(d, i) {
+    return i + 1;
+  });
+and the DOM will look like:
+
+<g class="item" transform="translate(0, 0)">
+  <text>1</text>
+  <circle r="40" />
+</g>
+<g class="item" transform="translate(120, 0)">
+  <text>2</text>
+  <circle r="40" />
+</g>
+<g class="item" transform="translate(240, 0)">
+  <text>3</text>
+  <circle r="40" />
+</g>
+
+.remove removes all the elements in a selection. 
+For example, given some circles, we can remove them using:
+
+d3.selectAll('circle')
+  .remove();
+
+  Chaining
+Most selection functions return the selection, meaning that 
+selection functions such as .style, .attr and .on can be chained:
+
+d3.selectAll('circle')
+  .style('fill', 'orange')
+  .attr('r', 20)
+  .on('click', function(d, i) {
+    d3.select('.status')
+      .text('You clicked on circle ' + i);
+  });
+
+ Each and call
+
+.each allows a function to be called on each 
+element of a selection and .call allows a 
+function to be called on the selection itself.
+
+In the case of .each D3 passes in the joined datum 
+(usually represented by d) and the index (usually 
+represented by i). Not only can .each enable reusable 
+components but it also allows computations to be 
+shared across calls to .style, .attr etc.
+
+Here’s an example of using .each to call a reusable component:
+
+function addNumberedCircle(d, i) {
+  d3.select(this)
+    .append('circle')
+    .attr('r', 40);
+
+  d3.select(this)
+    .append('text')
+    .text(i + 1)
+    .attr('y', 50)
+    .attr('x', 30);
+}
+
+d3.selectAll('g.item')
+  .each(addNumberedCircle);
+
+Here’s an example of .each used for the latter:
+
+d3.selectAll('circle')
+  .each(function(d, i) {
+    var odd = i % 2 === 1;
+
+    d3.select(this)
+      .style('fill', odd ? 'orange' : '#ddd')
+      .attr('r', odd ? 40 : 20);
+  });
+
+In the case of .call D3 passes in the selection itself. 
+This is a common pattern for reusable components.
+
+In the following example we create a similar component to before 
+using .call. This time the selection gets passed into 
+the component (rather than d and i):
+
+function addNumberedCircle(selection) {
+  selection
+    .append('circle')
+    .attr('r', 40);
+
+  selection
+    .append('text')
+    .text(function(d, i) {
+      return i + 1;
+    })
+    .attr('y', 50)
+    .attr('x', 30);
+}
+
+d3.selectAll('g.item')
+  .call(addNumberedCircle);
+
+Filtering and sorting selections
+
+We can filter a selection using .filter. A function
+ is usually passed into .filter which returns true 
+ if the element should be included. .filter 
+ returns the filtered selection.
+
+In this example we filter through even-numbered elements and colour them orange:
+
+d3.selectAll('circle')
+  .filter(function(d, i) {
+    return i % 2 === 0;
+  })
+  .style('fill', 'orange');
+
+Sorting only really makes sense if data has been joined to 
+the selection, so please read up on data joins first.
+
+We can sort elements in a selection by calling .sort and passing 
+in a comparator function. The comparator function has two arguments, 
+usually a and b, which represent the datums on the two elements being 
+compared. If the comparator function returns a negative number, a 
+will be placed before b and if positive, a will be placed after b.
+
+Thus if we have the following data joined to a selection:
+
+[
+  {
+    "name": "Andy",
+    "score": 37
+  },
+  {
+    "name": "Beth",
+    "score": 39
+  },
+  {
+    "name": "Craig",
+    "score": 31
+  },
+  {
+    "name": "Diane",
+    "score": 35
+  },
+  {
+    "name": "Evelyn",
+    "score": 38
+  }
+]
+we can sort by score using:
+
+  d3.selectAll('.person')
+    .sort(function(a, b) {
+      return b.score - a.score;
+    });
+
+/////////////////////////////////////////////////////////////////
+
+Data joins
+
+Given an array of data and a D3 selection we can attach or 
+‘join’ each array element to each element of the selection.
+
+This creates a close relationship between your data and graphical 
+elements which makes data-driven modification of the elements straightforward.
+
+For example if we have some SVG circles:
+
+<circle r="40" />
+<circle r="40" cx="120" />
+<circle r="40" cx="240" />
+<circle r="40" cx="360" />
+<circle r="40" cx="480" />
+and some data:
+
+var scores = [
+  {
+    "name": "Andy",
+    "score": 25
+  },
+  {
+    "name": "Beth",
+    "score": 39
+  },
+  {
+    "name": "Craig",
+    "score": 42
+  },
+  {
+    "name": "Diane",
+    "score": 35
+  },
+  {
+    "name": "Evelyn",
+    "score": 48
+  }
+]
+we can select the circles and then join the array to it:
+
+d3.selectAll('circle')
+  .data(scores);
+We can now manipulate the circles according to the joined data:
+
+d3.selectAll('circle')
+  .attr('r', function(d) {
+    return d.score;
+  });
+
+The above code sets the radius of each circle to each person’s score.
+
+Given an array myData and a selection s a data join is created using the function .data:
+
+var myData = [ 10, 40, 20, 30 ];
+
+var s = d3.selectAll('circle');
+
+s.data(myData);
+The array can contain any type e.g. objects:
+
+var cities = [
+  { name: 'London', population: 8674000},
+  { name: 'New York', population: 8406000},
+  { name: 'Sydney', population: 4293000}
+];
+
+var s = d3.selectAll('circle');
+
+s.data(cities);
+
+Although a couple of things occur when .data is called (see Under the Hood and Enter/Exit) 
+you probably won’t notice much change after joining your data.
+The real magic happens when you want to modify the 
+elements in your selection according to your data.
+
+Once we’ve joined data to a selection we can modify elements by passing a function 
+into the likes of .style and .attr (which we covered in Selections):
+
+d3.selectAll('circle')
+  .attr('r', function(d) {
+    return d;
+  });
+
+
+For each element in the selection D3 will 
+call this function, passing in the element’s
+ joined data as the first argument d. The function’s 
+ return value is used to set the style or attribute value.
+
+For example, given some circles:
+
+<circle />
+<circle />
+<circle />
+<circle />
+<circle />
+and some data:
+
+var myData = [ 10, 40, 20, 30, 50 ];
+let’s perform the data join:
+
+var s = d3.selectAll('circle');
+
+// Do the join
+s.data(myData);
+Now let’s update the radius of each circle in the selection to be equal to the corresponding data values:
+
+s.attr('r', function(d) {
+  return d;
+});
+
+We can return anything we like from the function, so long as it’s a 
+valid value for the style, attribute etc. that we’re modifying. 
+
+s.attr('r', function(d) {
+  return 2 * d;
+});
+
+Now let’s set a class on each element if the value is greater or equal to 40:
+
+s.classed('high', function(d) {
+  return d >= 40; // returns true or false
+});
+
+and finally we’ll position the circles horizontally using the i argument (see Selections):
+
+s.attr('cx', function(d, i) {
+  return i * 120;
+});
+Putting this all together we get:
+
+var myData = [ 10, 40, 20, 30, 50 ];
+
+var s = d3.selectAll('circle');
+
+// Do the data join
+s.data(myData);
+
+// Modify the selected elements
+s.attr('r', function(d) {
+  return d;
+  })
+  .classed('high', function(d) {
+    return d >= 40;
+  })
+  .attr('cx', function(d, i) {
+    return i * 120;
+  });
+
+If we have an array of objects we can join it in the usual manner:
+
+var cities = [
+  { name: 'London', population: 8674000},
+  { name: 'New York', population: 8406000},
+  { name: 'Sydney', population: 4293000},
+  { name: 'Paris', population: 2244000},
+  { name: 'Beijing', population: 11510000}
+];
+
+var s = d3.selectAll('circle');
+
+s.data(cities);
+
+s.attr('r', function(d) {
+    var scaleFactor = 0.000005;
+    return d.population * scaleFactor;
+  })
+  .attr('cx', function(d, i) {
+    return i * 120;
+  });
+
+  Of course, we not restricted to modifying circle elements. 
+  Supposing we had some rect and text elements, 
+  we can build a simple bar chart using what we’ve learnt:
+
+  var cities = [
+  { name: 'London', population: 8674000},
+  { name: 'New York', population: 8406000},
+  { name: 'Sydney', population: 4293000},
+  { name: 'Paris', population: 2244000},
+  { name: 'Beijing', population: 11510000}
+];
+
+// Join cities to rect elements and modify height, width and position
+d3.selectAll('rect')
+  .data(cities)
+  .attr('height', 19)
+  .attr('width', function(d) {
+    var scaleFactor = 0.00004;
+    return d.population * scaleFactor;
+  })
+  .attr('y', function(d, i) {
+    return i * 20;
+  })
+
+// Join cities to text elements and modify content and position
+d3.selectAll('text')
+  .data(cities)
+  .attr('y', function(d, i) {
+    return i * 20 + 13;
+  })
+  .attr('x', -4)
+  .text(function(d) {
+    return d.name;
+  });
+
+  Under the hood
+
+When D3 performs a data join it adds an attribute __data__ 
+to each DOM element in the selection and assigns the joined data to it.
+
+What if our array’s longer (or shorter) than the selection?
+So far we’ve looked at data joins where the selection
+ is exactly the same length as the data array. 
+Clearly this won’t always be the case and D3 handles 
+this using enter and exit. To learn more see the enter and exit section.
+
+There are a few instances (such as when dealing with geographic visualisations) 
+where it’s useful to join a single bit of data with a selection 
+(usually containing a single element). Supposing we have an object:
+
+var featureCollection = {type: 'FeatureCollection', features: features};
+we can join it to a single element using .datum:
+
+d3.select('path#my-map')
+  .datum(featureCollection);
+This just adds a __data__ attribute to the element 
+and assigns the joined data (featureCollection in this case) to it.
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+D3 Enter and exit
+
+d3.select('#content')
+  .selectAll('div')
+  .data(myData);
+In this example myData is the same length as the selection.
+
+However, what happens if the array has more (or less) elements than the selection?
+
+if the array is longer than the selection there’s a shortfall of DOM elements and we need to add elements
+if the array is shorter than the selection there’s a surplus of DOM elements and we need to remove elements
+Fortunately D3 can help in adding and removing DOM elements using two functions .enter and .exit.
+
+.enter identifies any DOM elements that need to be added when the joined array is longer than 
+the selection. It’s defined on an update selection (the selection returned by .data):
+
+d3.select('#content')
+  .selectAll('div')
+  .data(myData)
+  .enter();
+
+.enter returns an enter selection which basically represents the elements that need to be added.
+ It’s usually followed by .append which adds elements to the DOM:
+
+d3.select('#content')
+  .selectAll('div')
+  .data(myData)
+  .enter()
+  .append('div');
+Let’s look at an example. Suppose we have the following div elements:
+
+<div id="content">
+  <div></div>
+  <div></div>
+  <div></div>
+</div>
+and this data:
+
+var myData = ['A', 'B', 'C', 'D', 'E'];
+we use .enter and .append to add div elements for D and E:
+
+  d3.select('#content')
+    .selectAll('div')
+    .data(myData)
+    .enter()
+    .append('div');
+
+Note that we can join an array to an empty selection 
+which is a very common pattern in the examples on the D3 website.
+
+//////////////////////////////////////////////////////////
+
+.exit returns an exit selection which consists of the elements 
+that need to be removed from the DOM. It’s usually followed by .remove:
+
+d3.select('#content')
+  .selectAll('div')
+  .data(myData)
+  .exit()
+  .remove();
+
+Let’s repeat the example above, but using .exit. Starting with elements:
+
+<div id="content">
+  <div></div>
+  <div></div>
+  <div></div>
+</div>
+
+and data (notice that it’s shorter than the selection):
+
+var myData = ['A'];
+we use .exit and .remove to remove the surplus elements:
+
+d3.select('#content')
+  .selectAll('div')
+  .data(myData)
+  .exit()
+  .remove();
+
+/////////////////////////////////////////
+
+So far in this section we’ve not concerned ourselves 
+with modifying elements using functions such as .style, .attr and .classed.
+
+D3 allows us to be specific about which elements are 
+modified when new elements are entering. We can modify:
+
+the existing elements
+the entering elements
+both existing and entering elements
+
+(Most of the time the last option is sufficient, 
+but sometimes we might want to style entering elements differently.)
+
+The existing elements are represented by the update selection. 
+This is the selection returned by .data and is assigned to u in this example:
+
+var myData = ['A', 'B', 'C', 'D', 'E'];
+
+var u = d3.select('#content')
+  .selectAll('div')
+  .data(myData);
+
+u.enter()
+  .append('div');
+
+u.text(function(d) {
+  return d;
+});
+
+When the button is clicked, new elements are added, but because .text is only 
+called on the update selection, it’s only the existing elements that are modified. 
+(Note that if the button is clicked a second time, all the elements are modified. 
+This is because the selection will contain all 5 div elements. Don’t worry 
+about this too much if you’re new here!)
+
+The entering elements are represented by the enter selection. This is the selection 
+returned by .enter. We can modify the enter selection using:
+
+var myData = ['A', 'B', 'C', 'D', 'E'];
+
+var u = d3.select('#content')
+  .selectAll('div')
+  .data(myData);
+
+u.enter()
+  .append('div')
+  .text(function(d) {
+    return d;
+  });
+
+When the button is clicked, new elements are added and their text content is 
+updated. Only the entering elements have their text updated 
+because we call .text on the enter selection.
+
+If we want to modify the existing and entering elements we 
+could call .text on the update and enter selections.
+
+However D3 has a function .merge which can merge selections 
+together. This means we can do the following:
+
+var myData = ['A', 'B', 'C', 'D', 'E'];
+
+var u = d3.select('#content')
+  .selectAll('div')
+  .data(myData);
+
+u.enter()
+  .append('div')
+  .merge(u)
+  .text(function(d) {
+    return d;
+  });
+
+  General update pattern
+
+A common pattern (proposed by D3’s creator Mike Bostock) is to encapsulate the
+ above behaviour of adding, removing and updating DOM elements in a single function:
+
+function update(data) {
+  var u = d3.select('#content')
+    .selectAll('div')
+    .data(data);
+
+  u.enter()
+    .append('div')
+    .merge(u)
+    .text(function(d) {
+      return d;
+    });
+
+  u.exit().remove();
+}
+
+Typically the update function is called whenever the data changes.
+
+Here’s another example where we colour entering elements orange:
+
+function update(data) {
+  var u = d3.select('#content')
+    .selectAll('div')
+    .data(data);
+
+  u.enter()
+    .append('div')
+    .classed('new', true)
+    .text(function(d) {
+      return d;
+    });
+
+  u.text(function(d) {
+      return d;
+    })
+    .classed('new', false);
+
+  u.exit().remove();
+}
+
+When we do a data join D3 binds the first array element to the first 
+element in the selection, the second array element 
+to the second element in the selection and so on.
+
+However, if the order of array elements changes (such as during element 
+sorting, insertion or removal), the array elements 
+might get joined to different DOM elements.
+
+We can solve this problem by providing .data with a key function. 
+This function should return a unique id value for each array element,
+ allowing D3 to make sure each array element stays joined to the same DOM element.
+
+Let’s look at an example, first using a key function, and then without.
+
+We start with an array ['Z'] and each time the button is 
+clicked a new letter is added at the start of the array.
+
+Because of the key function each letter will stay bound to the same 
+DOM element meaning that when a new letter is 
+inserted each existing letter transitions into a new position:
+
+Without a key function the DOM elements’ text is updated 
+(rather than position) meaning we lose a meaningful transition effect:
+
+There’s many instances when key functions are not required but
+ if there’s any chance that your data elements can change position (e.g.
+  through insertion or sorting) and you’re using transitions 
+  then you should probably use them.
+
+//////////////////////////////////////////
+
+scale
+
+Scale functions are JavaScript functions that:
+
+take an input (usually a number, date or category) and
+return a value (such as a coordinate, a colour, a length or a radius)
+
+They’re typically used to transform (or ‘map’) data 
+values into visual variables (such as position, length and colour).
+
+For example, suppose we have some data:
+
+[ 0, 2, 3, 5, 7.5, 9, 10 ]
+we can create a scale function using:
+
+var myScale = d3.scaleLinear()
+  .domain([0, 10])
+  .range([0, 600]);
+
+For example they can transform:
+
+data values into lengths between 0 and 500 for a bar chart
+data values into positions between 0 and 200 for line charts
+% change data (+4%, +10%, -5% etc.) into a continuous range of
+colours (with red for negative and green for positive)
+dates into positions along an x-axis.
+
+D3 has around 12 different scale types (scaleLinear, scalePow, scaleQuantise, 
+scaleOrdinal etc.) and broadly speaking they can be classified into 3 groups:
+
+scales with continuous input and continuous output
+scales with continuous input and discrete output
+scales with discrete input and discrete output
+We’ll now look at these 3 categories one by one.
+
+They use a linear function (y = m * x + b) to interpolate across the domain and range.
+
+var linearScale = d3.scaleLinear()
+  .domain([0, 10])
+  .range([0, 600]);
+
+linearScale(0);   // returns 0
+linearScale(5);   // returns 300
+linearScale(10);  // returns 600
+
+The output range can also be specified as colours:
+
+var linearScale = d3.scaleLinear()
+  .domain([0, 10])
+  .range(['yellow', 'red']);
+
+linearScale(0);   // returns "rgb(255, 255, 0)"
+linearScale(5);   // returns "rgb(255, 128, 0)"
+linearScale(10);  // returns "rgb(255, 0, 0)"
+
+This can be useful for visualisations such as choropleth maps, 
+but also consider scaleQuantize, scaleQuantile and scaleThreshold.
+
+More included for completeness, rather than practical usefulness, 
+the power scale interpolates using a power (y = m * x^k + b) function. 
+The exponent k is set using .exponent():
+
+var powerScale = d3.scalePow()
+  .exponent(0.5)
+  .domain([0, 100])
+  .range([0, 30]);
+
+powerScale(0);   // returns 0
+powerScale(50);  // returns 21.21...
+powerScale(100); // returns 30
+
+scaleSqrt
+
+The scaleSqrt scale is a special case of the power scale (where k = 0.5) 
+and is useful for sizing circles by area (rather than radius). (When using 
+circle size to represent data, it’s considered better practice 
+to set the area, rather than the radius proportionally to the data.)
+
+var sqrtScale = d3.scaleSqrt()
+  .domain([0, 100])
+  .range([0, 30]);
+
+sqrtScale(0);   // returns 0
+sqrtScale(50);  // returns 21.21...
+sqrtScale(100); // returns 30
+
+scaleLog
+
+Log scales interpolate using a log function (y = m * log(x) + b) 
+and can be useful when the data has an exponential nature to it.
+
+var logScale = d3.scaleLog()
+  .domain([10, 100000])
+  .range([0, 600]);
+
+logScale(10);     // returns 0
+logScale(100);    // returns 150
+logScale(1000);   // returns 300
+logScale(100000); // returns 600
+
+scaleTime
+
+scaleTime is similar to scaleLinear except the domain is expressed as an array of dates.
+ (It’s very useful when dealing with time series data.)
+
+timeScale = d3.scaleTime()
+  .domain([new Date(2016, 0, 1), new Date(2017, 0, 1)])
+  .range([0, 700]);
+
+timeScale(new Date(2016, 0, 1));   // returns 0
+timeScale(new Date(2016, 6, 1));   // returns 348.00...
+timeScale(new Date(2017, 0, 1));   // returns 700
+
+scaleSequential
+
+scaleSequential is used for mapping continuous values to an output range 
+determined by a preset (or custom) interpolator. (An interpolator is a 
+function that accepts input between 0 and 1 and outputs an interpolated
+ value between two numbers, colours, strings etc.)
+
+D3 provides a number of preset interpolators including many colour 
+ones. For example we can use d3.interpolateRainbow to create the 
+well known rainbow colour scale:
+
+var sequentialScale = d3.scaleSequential()
+  .domain([0, 100])
+  .interpolator(d3.interpolateRainbow);
+
+sequentialScale(0);   // returns 'rgb(110, 64, 170)'
+sequentialScale(50);  // returns 'rgb(175, 240, 91)'
+sequentialScale(100); // returns 'rgb(110, 64, 170)'
+
+Note that the interpolator determines the output range 
+so you don’t need to specify the range yourself.
+The example below shows some of the other colour interpolators provided by D3:
+
+interpolateViridis
+interpolateInferno
+interpolateMagma
+interpolatePlasma
+interpolateWarm
+interpolateCool
+interpolateRainbow
+interpolateCubehelixDefault
+
+There’s also a plug-in d3-scale-chromatic which provides the well known ColorBrewer colour schemes.
+
+Clamping
+
+By default scaleLinear, scalePow, scaleSqrt, scaleLog, scaleTime and 
+scaleSequential allow input outside the domain. For example:
+
+var linearScale = d3.scaleLinear()
+  .domain([0, 10])
+  .range([0, 100]);
+
+linearScale(20);  // returns 200
+linearScale(-10); // returns -100
+
+In this instance the scale function uses extrapolation for values outside the domain.
+
+If we’d like the scale function to be restricted to input values 
+inside the domain we can ‘clamp’ the scale function using .clamp():
+
+linearScale.clamp(true);
+
+linearScale(20);  // returns 100
+linearScale(-10); // returns 0
+We can switch off clamping using .clamp(false).
+
+Nice
+
+If the domain has been computed automatically from real data (e.g. by using d3.extent) 
+the start and end values might not be round figures. This isn’t necessarily a problem, 
+but if using the scale to define an axis, it can look a bit untidy:
+
+var data = [0.243, 0.584, 0.987, 0.153, 0.433];
+var extent = d3.extent(data);
+
+var linearScale = d3.scaleLinear()
+  .domain(extent)
+  .range([0, 100]);
+
+  Therefore D3 provides a function .nice() on the scales in this 
+  section which will round the domain to ‘nice’ round values:
+
+linearScale.nice();
+
+
+Note that .nice() must be called each time the domain is updated.
+
+Multiple segments
+
+The domain and range of scaleLinear, scalePow, scaleSqrt, scaleLog and 
+scaleTime usually consists of two values, but if we provide 3 or more 
+values the scale function is subdivided into multiple segments:
+
+var linearScale = d3.scaleLinear()
+  .domain([-10, 0, 10])
+  .range(['red', '#ddd', 'blue']);
+
+linearScale(-10);  // returns "rgb(255, 0, 0)"
+linearScale(0);    // returns "rgb(221, 221, 221)"
+linearScale(5);    // returns "rgb(128, 128, 255)"
+
+Typically multiple segments are used for distinguishing between 
+negative and positive values (such as in the example above). We 
+can use as many segments as we like as long as the domain and 
+range are of the same length.
+
+Inversion
+
+The .invert() method allows us to determine a scale function’s input 
+value given an output value (provided the scale function has a numeric domain):
+
+var linearScale = d3.scaleLinear()
+  .domain([0, 10])
+  .range([0, 100]);
+
+linearScale.invert(50);   // returns 5
+linearScale.invert(100);  // returns 10
+
+A common use case is when we want to convert a user’s 
+click along an axis into a domain value:
+
+Scales with continuous input and discrete output
+scaleQuantize
+
+scaleQuantize accepts continuous input and outputs a number of discrete quantities defined by the range.
+
+var quantizeScale = d3.scaleQuantize()
+  .domain([0, 100])
+  .range(['lightblue', 'orange', 'lightgreen', 'pink']);
+
+quantizeScale(10);   // returns 'lightblue'
+quantizeScale(30);  // returns 'orange'
+quantizeScale(90);  // returns 'pink'
+
+Each range value is mapped to an equal sized chunk in the domain so in the example above:
+
+0 ≤ u < 25 is mapped to ‘lightblue’
+25 ≤ u < 50 is mapped to ‘orange’
+50 ≤ u < 75 is mapped to ‘lightgreen’
+75 ≤ u < 100 is mapped to ‘pink’
+where u is the input value.
+
+Note also that input values outside the domain are clamped so in our example quantizeScale(-10) 
+returns ‘lightblue’ and quantizeScale(110) returns ‘pink’.
+
+scaleQuantile
+
+scaleQuantile maps continuous numeric input to discrete values. The domain is defined by an array of numbers:
+
+var myData = [0, 5, 7, 10, 20, 30, 35, 40, 60, 62, 65, 70, 80, 90, 100];
+
+var quantileScale = d3.scaleQuantile()
+  .domain(myData)
+  .range(['lightblue', 'orange', 'lightgreen']);
+
+quantileScale(0);   // returns 'lightblue'
+quantileScale(20);  // returns 'lightblue'
+quantileScale(30);  // returns 'orange'
+quantileScale(65);  // returns 'lightgreen'
+
+The (sorted) domain array is divided into n equal sized groups where n is the number of range values.
+
+Therefore in the above example the domain array is split into 3 groups where:
+
+the first 5 values are mapped to ‘lightblue’
+the next 5 values to ‘orange’ and
+the last 5 values to ‘lightgreen’.
+The split points of the domain can be accessed using .quantiles():
+
+quantileScale.quantiles();  // returns [26.66..., 63]
+If the range contains 4 values quantileScale computes the quartiles of the data. 
+In other words, the lowest 25% of the data is mapped to range[0], 
+the next 25% of the data is mapped to range[1] etc.
+
+scaleThreshold
+
+scaleThreshold maps continuous numeric input to discrete values defined by the range. 
+n-1 domain split points are specified where n is the number of range values.
+
+In the following example we split the domain at 0, 50 and 100
+
+u < 0 is mapped to ‘#ccc’
+0 ≤ u < 50 to ‘lightblue’
+50 ≤ u < 100 to ‘orange’
+u ≥ 100 to ‘#ccc’
+where u is the input value.
+
+var thresholdScale = d3.scaleThreshold()
+  .domain([0, 50, 100])
+  .range(['#ccc', 'lightblue', 'orange', '#ccc']);
+
+thresholdScale(-10);  // returns '#ccc'
+thresholdScale(20);   // returns 'lightblue'
+thresholdScale(70);   // returns 'orange'
+thresholdScale(110);  // returns '#ccc'
+
+scaleOrdinal
+
+scaleOrdinal maps discrete values (specified by an array) to discrete values (also 
+specified by an array). The domain array specifies the possible input values
+ and the range array the output values. The range array will 
+ repeat if it’s shorter than the domain array.
+
+var myData = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+var ordinalScale = d3.scaleOrdinal()
+  .domain(myData)
+  .range(['black', '#ccc', '#ccc']);
+
+ordinalScale('Jan');  // returns 'black';
+ordinalScale('Feb');  // returns '#ccc';
+ordinalScale('Mar');  // returns '#ccc';
+ordinalScale('Apr');  // returns 'black';
+
+By default if a value that’s not in the domain is used as input, the scale will implicitly add the value to the domain:
+
+ordinalScale('Monday');  // returns 'black';
+If this isn’t the desired behvaiour we can specify an output value for unknown values using .unknown():
+
+ordinalScale.unknown('Not a month');
+ordinalScale('Tuesday'); // returns 'Not a month'
+
+scaleBand
+
+When creating bar charts scaleBand helps to determine the geometry of the bars, 
+taking into account padding between each bar. The domain is specified as an array 
+of values (one value for each band) and the range as the minimum and maximum 
+extents of the bands (e.g. the total width of the bar chart).
+
+In effect scaleBand will split the range into n bands (where n is the number of 
+values in the domain array) and compute the positions and widths of the bands 
+taking into account any specified padding.
+
+var bandScale = d3.scaleBand()
+  .domain(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
+  .range([0, 200]);
+
+bandScale('Mon'); // returns 0
+bandScale('Tue'); // returns 40
+bandScale('Fri'); // returns 160
+The width of each band can be accessed using .bandwidth():
+
+bandScale.bandwidth();  // returns 40
+Two types of padding may be configured:
+
+paddingInner which specifies (as a percentage of the band width) the amount of padding between each band
+paddingOuter which specifies (as a percentage of the band width) the 
+  amount of padding before the first band and after the last band
+
+Let’s add some inner padding to the example above:
+
+bandScale.paddingInner(0.05);
+
+bandScale.bandWidth();  // returns 38.38...
+bandScale('Mon');       // returns 0
+bandScale('Tue');       // returns 40.40...
+Putting this all together we can create this bar chart:
+
+scalePoint
+
+scalePoint creates scale functions that map from a discrete 
+set of values to equally spaced points along the specified range:
+
+var pointScale = d3.scalePoint()
+  .domain(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
+  .range([0, 500]);
+
+pointScale('Mon');  // returns 0
+pointScale('Tue');  // returns 125
+pointScale('Fri');  // returns 500
+
+The distance between the points can be accessed using .step():
+
+pointScale.step();  // returns 125
+
+Outside padding can be specified as the ratio of the padding to point spacing. 
+For example, for the outside padding to be a quarter of the point spacing use a value of 0.25:
+
+pointScale.padding(0.25);
+
+pointScale('Mon');  // returns 27.77...
+pointScale.step();  // returns 111.11...
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+Shapes
+This chapter looks at the functions D3 provides for taking the effort out of creating vector shapes such as lines:
+curves
+pie chart segments:
+and symbols:
+
+SVG
+First a little background on Scalable Vector Graphics (SVG). The shapes in the 
+examples above are made up of SVG path elements.Each of them has 
+a d attribute (path data) which defines the shape of the path
+
+
+line	Generates path data for a multi-segment line (typically for line charts)
+area	Generates path data for an area (typically for stacked line charts and streamgraphs)
+stack	Generates stack data from multi-series data
+arc	Generates path data for an arc (typically for pie charts)
+pie	Generates pie angle data from array of data
+symbol	Generates path data for symbols such as plus, star, diamond
+
+D3’s line generator produces a path data string given an array of co-ordinates.
+
+We start by constructing a line generator using d3.line():
+
+var lineGenerator = d3.line();
+lineGenerator is just a function that accepts an array of co-ordinates and outputs a path data string.
+
+So let’s go ahead and define an array of co-ordinates:
+
+var points = [
+  [0, 80],
+  [100, 100],
+  [200, 30],
+  [300, 50],
+  [400, 40],
+  [500, 80]
+];
+
+and now call lineGenerator, passing in our array:
+
+var pathData = lineGenerator(points);
+// pathData is "M0,80L100,100L200,30L300,50L400,40L500,80"
+All lineGenerator has done is create a string of M (move to) and L (line to) 
+commands from our array of points. We can now use pathData to set the d attribute of a path element:
+
+d3.select('path')
+  .attr('d', pathData);
+
+  We can also configure our line generator in a number of ways:
+
+.x() and .y() accessor functions,
+.defined() (to handle missing data),
+.curve (to specify how the points are interpolated) and
+.context() to render to a canvas element.
+
+.x() and .y() accessor functions
+
+By default each array element represents a co-ordinate 
+defined by a 2-dimensional array (e.g. [0, 100]). 
+However we can specify how the line generator interprets 
+each array element using accessor functions .x() and .y().
+
+For example suppose our data is an array of objects:
+
+var data = [
+  {value: 10}, 
+  {value: 50}, 
+  {value: 30}, 
+  {value: 40}, 
+  {value: 20}, 
+  {value: 70},
+  {value: 50}
+];
+We can define the accessors like so:
+
+lineGenerator
+  .x(function(d, i) {
+    return xScale(i);
+  })
+  .y(function(d) {
+    return yScale(d.value);
+  });
+
+In this example we’re using the index of the array to define 
+the x position. Note also that we’re using scale functions:
+
+.defined()
+
+We can configure the behaviour when there’s missing data. Suppose our data has a gap in it:
+
+var points = [
+  [0, 80],
+  [100, 100],
+  null,
+  [300, 50],
+  [400, 40],
+  [500, 80]
+];
+
+we can tell our line generator that each co-ordinate is valid only if it’s non-null:
+
+lineGenerator
+  .defined(function(d) {
+    return d !== null;
+  });
+
+Now when we call lineGenerator it leaves a gap in the line:
+
+(Without configuring .defined this last call returns an error.)
+
+.curve()
+
+We can also configure how the points are interpolated. 
+For example we can interpolate each data point with a B-spline:
+
+var lineGenerator = d3.line()
+  .curve(d3.curveCardinal);
+
+  Although there’s a multitude of different curve types available
+   they can be divided into two camps: those which pass through the 
+   points (curveLinear, curveCardinal, curveCatmullRom, curveMonotone, 
+   curveNatural and curveStep) and those that don’t (curveBasis and curveBundle).
+/////////////////////////////////////////////////////////////////
+Rendering to canvas
+
+By default the shape generators output SVG path data. 
+However they can be configured to draw to a 
+canvas element using the .context() function:
+
+var context = d3.select('canvas').node().getContext('2d');
+
+lineGenerator.context(context);
+
+context.strokeStyle = '#999';
+context.beginPath();
+lineGenerator(points);
+context.stroke();
+
+Radial line
+
+The radial line generator is similar to the line generator but the points are 
+transformed by angle (working clockwise from 12 o’clock) and radius, rather than x and y:
+
+var radialLineGenerator = d3.radialLine();
+
+var points = [
+  [0, 80],
+  [Math.PI * 0.25, 80],
+  [Math.PI * 0.5, 30],
+  [Math.PI * 0.75, 80],
+  [Math.PI, 80],
+  [Math.PI * 1.25, 80],
+  [Math.PI * 1.5, 80],
+  [Math.PI * 1.75, 80],
+  [Math.PI * 2, 80]
+];
+
+var pathData = radialLineGenerator(points);
+
+Accessor functions .angle() and .radius() are also available:
+
+radialLineGenerator
+  .angle(function(d) {
+    return d.a;
+  })
+  .radius(function(d) {
+    return d.r;
+  });
+
+var points = [
+  {a: 0, r: 80},
+  {a: Math.PI * 0.25, r: 80},
+  {a: Math.PI * 0.5, r: 30},
+  {a: Math.PI * 0.75, r: 80},
+  ...
+];
+
+var pathData = radialLineGenerator(points);
+
+Area generator
+The area generator outputs path data that defines an area 
+between two lines. By default it generates the area between 
+y=0 and a multi-segment line defined by an array of points:
+
+var areaGenerator = d3.area();
+
+var points = [
+  [0, 80],
+  [100, 100],
+  [200, 30],
+  [300, 50],
+  [400, 40],
+  [500, 80]
+];
+
+var pathData = areaGenerator(points);
+
+We can configure the baseline using the .y0() accessor function:
+
+areaGenerator.y0(150);
+
+We can also feed a function into the .y0() accessor, likewise the .y1() accessor:
+
+areaGenerator
+  .x(function(d) {
+    return d.x;
+  })
+  .y0(function(d) {
+    return yScale(d.low);
+  })
+  .y1(function(d) {
+    return yScale(d.high);
+  });
+
+var points = [
+  {x: 0, low: 30, high: 80},
+  {x: 100, low: 80, high: 100},
+  {x: 200, low: 20, high: 30},
+  {x: 300, low: 20, high: 50},
+  {x: 400, low: 10, high: 40},
+  {x: 500, low: 50, high: 80}
+];
+
+Typically .y0() defines the baseline and .y1() the top line. 
+Note that we’ve also used the .x() accessor to define the x co-ordinate.
+
+As with the line generator we can specify the way in which the points are interpolated (.curve()),
+ handle missing data (.defined()) and render to canvas (.context());
+
+Radial area
+
+The radial area generator is similar to the area generator but the points
+ are transformed by angle (working clockwise from 12 o’clock) and radius, 
+ rather than x and y:
+
+ var radialAreaGenerator = d3.radialArea()
+  .angle(function(d) {
+    return d.angle;
+  })
+  .innerRadius(function(d) {
+    return d.r0;
+  })
+  .outerRadius(function(d) {
+    return d.r1;
+  });
+
+var points = [
+  {angle: 0, r0: 30, r1: 80},
+  {angle: Math.PI * 0.25, r0: 30, r1: 70},
+  {angle: Math.PI * 0.5, r0: 30, r1: 80},
+  {angle: Math.PI * 0.75, r0: 30, r1: 70},
+  {angle: Math.PI, r0: 30, r1: 80},
+  {angle: Math.PI * 1.25, r0: 30, r1: 70},
+  {angle: Math.PI * 1.5, r0: 30, r1: 80},
+  {angle: Math.PI * 1.75, r0: 30, r1: 70},
+  {angle: Math.PI * 2, r0: 30, r1: 80}
+];
+
+Stack generator
+The stack generator takes an array of multi-series data and generates 
+an array for each series where each series contains lower and upper 
+values for each data point. The lower and upper values are computed 
+so that each series is stacked on top of the previous series.
+
+var data = [
+  {day: 'Mon', apricots: 120, blueberries: 180, cherries: 100},
+  {day: 'Tue', apricots: 60,  blueberries: 185, cherries: 105},
+  {day: 'Wed', apricots: 100, blueberries: 215, cherries: 110},
+  {day: 'Thu', apricots: 80,  blueberries: 230, cherries: 105},
+  {day: 'Fri', apricots: 120, blueberries: 240, cherries: 105}
+];
+
+var stack = d3.stack()
+  .keys(['apricots', 'blueberries', 'cherries']);
+
+var stackedSeries = stack(data);
+
+// stackedSeries = [
+//   [ [0, 120],   [0, 60],   [0, 100],    [0, 80],    [0, 120],   key: 'apricots' ],
+//   [ [120, 300], [60, 245], [100, 315],  [80, 310],  [120, 360], key: 'blueberries' ],
+//   [ [300, 400], [245, 350], [315, 425], [310, 415], [360, 465], key: 'cherries' ]
+// ]
+The .keys() configuration function specifies 
+which series are included in the stack generation.
+
+The data output by the stack generator can be used however you like, 
+but typically it’ll be used to produce stacked bar charts:
+
+.order()
+
+The order of the stacked series can be configured using .order():
+
+stack.order(d3.stackOrderInsideOut);
+Each series is summed and then sorted according to the chosen order. The possible orders are:
+
+stackOrderNone	(Default) Series in same order as specified in .keys()
+stackOrderAscending	Smallest series at the bottom
+stackOrderDescending	Largest series at the bottom
+stackOrderInsideOut	Largest series in the middle
+stackOrderReverse	Reverse of stackOrderNone
+
+.offset()
+
+By default the stacked series have a baseline of zero. However we can 
+configure the offset of the stack generator to achieve different effects. 
+For example we can normalise the stacked series so that they fill the same height:
+
+stack.offset(d3.stackOffsetExpand);
+
+The available offsets are:
+
+stackOffsetNone	(Default) No offset
+stackOffsetExpand	Sum of series is normalised (to a value of 1)
+stackOffsetSilhouette	Center of stacks is at y=0
+stackOffsetWiggle	Wiggle of layers is minimised (typically used for streamgraphs)
+Here’s a streamgraph example using stackOffsetWiggle:
+
+Arc generator
+Arc generators produce path data from angle and radius values. An arc generator is created using:
+
+var arcGenerator = d3.arc();
+It can then be passed an object containing startAngle, endAngle, innerRadius and outerRadius properties to produce the path data:
+
+var pathData = arcGenerator({
+  startAngle: 0,
+  endAngle: 0.25 * Math.PI,
+  innerRadius: 50,
+  outerRadius: 100
+});
+
+// pathData is "M6.123233995736766e-15,-100A100,100,0,0,1,70.71067811865476,-70.710678
+// 11865474L35.35533905932738,-35.35533905932737A50,50,0,0,0,3.061616997868383e-15,-50Z"
+(startAngle and endAngle are measured clockwise from the 12 o’clock in radians.)
+
+Configuration
+
+We can configure innerRadius, outerRadius, startAngle, endAngle so that we don’t have to pass them in each time:
+
+arcGenerator
+  .innerRadius(20)
+  .outerRadius(100);
+
+pathData = arcGenerator({
+  startAngle: 0,
+  endAngle: 0.25 * Math.PI
+});
+
+We can also configure corner radius (cornerRadius) and the padding between arc segments (padAngle and padRadius):
+
+arcGenerator
+  .padAngle(.02)
+  .padRadius(100)
+  .cornerRadius(4);
+
+  Arc padding takes two parameters padAngle and padRadius which when multiplied together 
+  define the distance between adjacent segments. Thus in the example above, the padding 
+  distance is 0.02 * 100 = 2. Note that the padding is calculated to maintain 
+  (where possible) parallel segment boundaries.
+
+You might ask why there isn't a single parameter padDistance for defining the padding 
+distance. It's split into two parameters so that the pie generator (see later) 
+doesn't need to concern itself with radius.
+
+Accessor functions
+
+We also define accessor functions for startAngle, endAngle, innerRadius and outerRadius e.g.
+
+arcGenerator
+  .startAngle(function(d) { 
+    return d.startAngleOfMyArc;
+  })
+  .endAngle(function(d) {
+    return d.endAngleOfMyArc;
+  });
+
+arcGenerator({
+  startAngleOfMyArc: 0,
+  endAngleOfMyArc: 0.25 * Math.PI
+});
+
+Centroid
+
+It’s sometimes useful to calculate the centroid of an arc, 
+such as when positioning labels, and D3 has a function .centroid() for doing this:
+
+arcGenerator.centroid({
+  startAngle: 0,
+  endAngle: 0.25 * Math.PI
+});
+// returns [22.96100594190539, -55.43277195067721]
+
+Pie generator
+The pie generator goes hand in hand with the arc generator. Given an array of data,
+ the pie generator will output an array of objects containing the 
+ original data augmented by start and end angles:
+
+var pieGenerator = d3.pie();
+var data = [10, 40, 30, 20, 60, 80];
+var arcData = pieGenerator(data);
+
+// arcData is an array of objects: [
+//   {
+//     data: 10,
+//     endAngle: 6.28...,
+//     index: 5,
+//     padAngle: 0,
+//     startAngle: 6.02...,
+//     value: 10
+//   },
+//   ...
+// ]
+We can then use an arc generator to create the path strings:
+
+var arcGenerator = d3.arc()
+  .innerRadius(20)
+  .outerRadius(100);
+
+d3.select('g')
+  .selectAll('path')
+  .data(arcData)
+  .enter()
+  .append('path')
+  .attr('d', arcGenerator);
+
+Notice that the output of pieGenerator contains the properties 
+startAngle and endAngle. These are the same properties 
+required by arcGenerator.
+
+
+The pie generator has a number of configuration functions including .padAngle(), 
+.startAngle(), .endAngle() and .sort(). .padAngle() specifies an angular 
+padding (in radians) between neighbouring segments.
+
+.startAngle() and .endAngle() configure the start and end angle of the pie chart. 
+This allows, for example, the creation of semi-circular pie charts:
+
+var pieGenerator = d3.pie()
+  .startAngle(-0.5 * Math.PI)
+  .endAngle(0.5 * Math.PI);
+
+  By default the segment start and end angles are specified such that the 
+  segments are in descending order. However we can change the sort order using .sort:
+
+var pieGenerator = d3.pie()
+  .value(function(d) {return d.quantity;})
+  .sort(function(a, b) {
+    return a.name.localeCompare(b.name);
+  });
+
+var fruits = [
+  {name: 'Apples', quantity: 20},
+  {name: 'Bananas', quantity: 40},
+  {name: 'Cherries', quantity: 50},
+  {name: 'Damsons', quantity: 10},
+  {name: 'Elderberries', quantity: 30},
+];
+
+Symbols
+The symbol generator produces path data for symbols commonly used in data visualisation:
+
+var symbolGenerator = d3.symbol()
+  .type(d3.symbolStar)
+  .size(80);
+
+var pathData = symbolGenerator();
+We can then use pathData to define the d attribute of a path element:
+
+d3.select('path')
+  .attr('d', pathData);
+Here’s a simple chart using the symbol generator:
+
+d3.symbolCircle
+d3.symbolCross
+d3.symbolDiamond
+d3.symbolSquare
+d3.symbolStar
+d3.symbolTriangle
+d3.symbolWye
+
+////////////////////////////////////////////////////////////////////////
+
+Transitions and Animations:
+To create a square like this in d3, we would write something like:
+var mySquare=svg.append("rect")   .attr("x",60)   .attr("y",60)   .attr("width",60)   .attr("height",60);
+
+4 attributes. Simple enough. So if we want to make it move to the right, we are going to update the x attribute. That’s how we do it:
+
+mySquare   .transition()   .attr("x",320);
+It’s that simple: use the transition method, then specify all you want to see 
+changed just as if you were creating a new item. And using that one 
+principle, we can easily reproduce any of the above examples.
+
+mySquare   
+.transition()   
+.attr("width",120); // will make it bigger   mySquare   
+.style("fill","white") // if the fill is originally left blank and comes                          
+//  from a style sheet, it will start as black    
+.transition()   
+.style("fill","blue");   mySquare   
+.transition()   
+.style("opacity",0);
+
+
+Now, in our simple examples, this is not exactly what happens.
+ The transitions occur after an event, namely, when the user 
+ clicks on the button. And indeed, transitions are most useful 
+ when linked to events and interaction. But this doesn’t add a 
+ whole new layer of complexity. We can just write:
+
+button.on("click", function() {   mySquare.transition().attr("x",320); })
+
+After using the transition() method, it’s possible to specify 
+a value for duration and delay. Duration is the number of 
+milliseconds the transition will last, while delay 
+is the number of milliseconds the system will 
+wait before launching it. The syntax is:
+
+mySquare.transition()   
+.attr("x",320)   
+.duration(1000) 
+// this is 1s   
+.delay(100)    
+ // this is 0.1s
+
+The default is a 250ms duration, and no delay. I find 250ms to be a 
+bit harsh. In most cases, transitions should be noticeable, so I 
+oftentimes find myself increasing the duration to 500 or 1000. 
+But unless there is a very good reason for that, durations should not be too long. 
+
+mysquare.transition()   .attr("x",320)   .ease("elastic")
+(and by the way, the order in which you change attributes or specify 
+animation parameters has no effect, 
+so feel free to use .ease first then .attr).
+
+ you may have noticed that the values change slowly first, 
+ and then faster, then slowly at the end. Well, it turns 
+ out that you can use different functions to get different result
+
+Sometimes — often, actually — you want to fire a transition right after another transition. 
+But in case you were wondering, the following doesn’t work:
+
+mysquare.transition()   .attr("x",320); mysquare.transition()   .attr("y",200);
+
+You may think that this will move the square right, then down. But no: it will start to
+ move the square right, then fire the second transition which will move it down. Since 
+ they have the same duration and no delay, what will happen is that only the second 
+ will have a visible effect. If the second transition had a delay, smaller than the 
+ first transition’s duration, the first one will be in effect for a while until the 
+ delay expires. Then, the second transition will take over. However, chances are you 
+ don’t want to do that, because how much of the first transition will have been 
+ accomplished depends on the user’s machine, browser etc., and is therefore unpredictable.
+  So how about giving the second transition a delay that corresponds exactly to the 
+  duration of the first one? This will usually work, but the delays and durations are not 
+  extremely accurate. Firing the transition properly takes a certain time (which is
+   roughly 15ms on my machine and may vary), so it is difficult to chain two 
+   transitions very precisely this way. In more complex programs than our simplistic 
+   examples, sometimes, several events try to trigger transitions on the same object. 
+   When this happens, the first transaction is fired, and runs its course unless 
+   another transition starts. That second transition would interrupt, then replace 
+   the first one. What this means is that the attributes that were in the process 
+   of being changed by the first transition will remain as they were when the 
+   second transition starts, somewhere between their start and target value. 
+   If you want to make sure that all your transitions update their attribute 
+   up to the value they are supposed to reach, you may want to re-specify the 
+   attributes of the first transition in subsequent ones, like so:
+
+   mysquare.transition()   
+   .attr("x",320);
+   
+    mysquare.transition()   
+   .delay(250)   .attr("y",200)   
+   .attr("x",320); // even if the first transition doesn't complete,                    
+   // this one will and will update x to 320.
+
+There is a more certain way to chain two transitions. With the following syntax, 
+another event will start exactly at the end of a transition. That other event 
+can be another transition (which is the case in the above example).
+
+mysquare  .transition()     ...    .each("end", function() { ... });
+
+Here, what’s in the callback function on the last line, introduced by .each(“end”, 
+will be fired exactly as the transition ends. What can be done then? Here are 
+3 common scenarios.
+
+(if you’re wondering what the difference is between this and the previous example,
+ there is none – it’s just to save you some scrolling). One possibility is to 
+ launch another transition on the same item. Here, the square moves right, 
+ then down. Here’s how it’s done:
+
+mysquare   
+.transition()   
+.attr("x",320)   
+.each("end",function() { 
+  // as seen above     
+  d3.select(this).       
+  // this is the object      
+    transition()       
+      // a new transition!      
+         .attr("y",180);   
+          // we could have had another     
+                                 // .each("end" construct here.    });
+
+Another possibility is to delete the object after the transition has run its course. 
+This is super useful, especially when you are creating a lot of temporary objects. 
+An interesting combo is when you decrease opacity all the way to 0, 
+making it invisible, then using remove() if you don’t need it anymore.
+
+mysquare   
+.transition()  
+ .attr("x",320)  
+  .each("end",function() {   
+       d3.select(this).       
+       // so far, as above     
+         remove();           
+          // we delete the object instead  
+             });
+
+Finally, we can create a new object. That can be a nice way 
+to add a special effect. Here’s an example:
+Here, at the end of the transition, a circle is created,
+ a transition is started on that circle, which decreases opacity to 0, then the circle is removed.
+And here is one last example with several effects combined.
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+d3 zoom
+
+This example demonstrates using d3-zoom to drive changes to scales’ 
+domains via transform.rescaleX and transform.rescaleY. The transformed 
+scales are used to draw axes. The transform is also applied via SVG transform 
+to the colorful rainbow rect. 
+(The colors are from Nadieh Bremer’s lovely SVG gradient tutorial.)
+
+index.html#
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.axis path {
+  display: none;
+}
+
+.axis line {
+  stroke-opacity: 0.3;
+  shape-rendering: crispEdges;
+}
+
+.view {
+  fill: url(#gradient);
+  stroke: #000;
+}
+
+button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+</style>
+<button>Reset</button>
+<svg width="960" height="500">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop   offset="0.0%" stop-color="#2c7bb6"></stop>
+      <stop  offset="12.5%" stop-color="#00a6ca"></stop>
+      <stop  offset="25.0%" stop-color="#00ccbc"></stop>
+      <stop  offset="37.5%" stop-color="#90eb9d"></stop>
+      <stop  offset="50.0%" stop-color="#ffff8c"></stop>
+      <stop  offset="62.5%" stop-color="#f9d057"></stop>
+      <stop  offset="75.0%" stop-color="#f29e2e"></stop>
+      <stop  offset="87.5%" stop-color="#e76818"></stop>
+      <stop offset="100.0%" stop-color="#d7191c"></stop>
+    </linearGradient>
+  </defs>
+</svg>
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script>
+
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+var zoom = d3.zoom()
+    .scaleExtent([1, 40])
+    .translateExtent([[-100, -100], [width + 90, height + 100]])
+    .on("zoom", zoomed);
+
+var x = d3.scaleLinear()
+    .domain([-1, width + 1])
+    .range([-1, width + 1]);
+
+var y = d3.scaleLinear()
+    .domain([-1, height + 1])
+    .range([-1, height + 1]);
+
+var xAxis = d3.axisBottom(x)
+    .ticks((width + 2) / (height + 2) * 10)
+    .tickSize(height)
+    .tickPadding(8 - height);
+
+var yAxis = d3.axisRight(y)
+    .ticks(10)
+    .tickSize(width)
+    .tickPadding(8 - width);
+
+var view = svg.append("rect")
+    .attr("class", "view")
+    .attr("x", 0.5)
+    .attr("y", 0.5)
+    .attr("width", width - 1)
+    .attr("height", height - 1);
+
+var gX = svg.append("g")
+    .attr("class", "axis axis--x")
+    .call(xAxis);
+
+var gY = svg.append("g")
+    .attr("class", "axis axis--y")
+    .call(yAxis);
+
+d3.select("button")
+    .on("click", resetted);
+
+svg.call(zoom);
+
+function zoomed() {
+  view.attr("transform", d3.event.transform);
+  gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
+  gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
+}
+
+function resetted() {
+  svg.transition()
+      .duration(750)
+      .call(zoom.transform, d3.zoomIdentity);
+}
+
+</script>
+
+
+
+//////////////////////////////////////////////////////////////////////////
+
+Still need to cover:
+Layouts
+Geographic
+Requests
+Transitions
+Interaction
+Reusable components
+Other
+Builds
+
+https://github.com/d3/d3-shape
+
+
+d3 styles too

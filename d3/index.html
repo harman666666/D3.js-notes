@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>title</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+  </head>
+  <body>
+<h3>SVG Bar </h3>
+  
+
+
+    <script>
+ /*
+var w = 500;
+var h = 100;
+
+var padding = 2;
+var dataset = [5,10,15,20,25]
+
+//assign new svg to variable, then perform methods and functions on that object
+
+       var svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h)
+var svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h)
+svg.selectAll("rect") 
+    .data(dataset)  //New operator, pass dataset
+    .enter()    //its gunna take all the rectangles and its going to create new ones 
+                //for all the different elements on the dataset, 
+                //there arent any on the page so it creates it
+    .append("rect")
+    .attr("x", function(d, i){  //space out the columns
+        //i is index of dataset
+        return i * (w/dataset.length); 
+    })
+    .attr("y", function(d){ //y value is height minus the data value
+        return h - (d * 4); //take height of viewport and subtract the value of the dataset, and 
+        //converts it so it starts from the bottom of the viewing window. (because top left is 0,0)
+        //the multiply by 4 makes the heighe for visible for aesthetic reasons.
+    })
+    .attr("width", w/dataset.length - padding) //DYNAMIC Data autoadjusts to 
+                                              //size of window and varibles
+    .attr("height", function(d){
+        //d paramater means it takes dataset
+
+        return d*4;
+    });
+
+  </script>
+
+  <script>
+  /*
+//Should set a window to draw the shapes within.
+var w = 300;
+var h = 100; //You can dynamically adjust these maybe based on height and width of screen
+
+var padding = 2; //Spacing between the bars. 
+var dataset = [5,10,15,20, 25, 11, 25, 22, 18 ,7];
+
+barHeightExpansionFactor = 4;
+
+function colorPicker(v){
+    if (v<= 20) {return "#666666";}
+    else if (v>20) {return "#FF0033"}
+}
+
+var svg = d3.select("body").append("svg")
+            .attr("width", w)
+            .attr("height", h)
+
+svg.selectAll('rect')
+   .data(dataset)
+   .enter()
+   .append("rect")
+          .attr("x", function(d, i ){
+              //d is how you ref dataset
+              return i * (w/dataset.length);
+          })
+          .attr("y", function(d){
+              //top left is wher you start in terms of coordinates
+             return h - (d * barHeightExpansionFactor );
+
+              
+          })
+         .attr("width", w/dataset.length - padding)
+         .attr("height", function(d) {return d*barHeightExpansionFactor  })     
+         .attr("fill", function(d){
+             return "rgb(" + (d*10)+ ", 0, 0)";
+         }); // We can use rgb codes or hexadecimal codes tooo, play around with these. 
+            //gradient type scale.
+            //yoU COULD use colorPicker to if you want
+
+//Adding text isnt that much harder either:
+
+svg.selectAll("text")
+   .data(dataset)
+   .enter()
+   .append("text")
+   .text(function (d) {return d; })
+      .attr(
+       "text-anchor", "middle")
+       .attr(
+       "x", function(d , i) {return i*(w/dataset.length) +  (w/dataset.length - padding)/2;} )
+       .attr(
+       "y", function(d) {return h- (d*barHeightExpansionFactor) + 14; }
+       )
+       .attr("font-family", "sans-serif")   //CSS Properties being added. 
+       .attr("font-size", 12)
+       .attr("fill", "#ffffff")
+   
+/*SVG can be styled with CSS because of these reasons;
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="60">
+  <text x="10" y="40"
+      style="font-family: Times New Roman;
+             font-size: 44px;
+             stroke: #00ff00;
+             fill: #0000ff;">
+    SVG text styling
+  </text>
+</svg>
+
+
+*/
+
+  </script>
+<script>
+ /*   //Building a Line CHARTS
+
+var h = 350;
+var w = 400;
+
+monthlySales = [
+{"month": 10, "sales": 200},
+{"month": 20, "sales": 15},
+{"month": 30, "sales": 302},
+{"month": 40, "sales": 180},
+{"month": 50, "sales": 25},
+{"month": 60, "sales": 7},
+{"month": 70, "sales": 120},
+{"month": 80, "sales": 130}
+];
+
+var lineFun = d3.line() //d3.svg.line was depricated as of V4 
+.x(function(d) {return d.month*4;})
+.y(function(d) {return h-d.sales}) //h-d so line isnt drawn upside down
+.curve(d3.curveLinear); //d3.curveBasis looks like a nice curve.
+//Different types of line charts based on what you put in
+//line is an operator that generates svg html for us that draws a line
+//so lineFun is basically a function that we're going to use and we're going to pass
+//in some data, and its going to draw a line for us.
+
+/*
+up vote
+6
+down vote
+In D3 v4.x, the line generator takes a curve to define the interpolation:
+
+While lines are defined as a sequence of two-dimensional [x, y] points, 
+and areas are similarly defined by a topline and a baseline, there remains 
+the task of transforming this discrete representation into a continuous shape: i.e., 
+how to interpolate between the points. A variety of curves are provided for this purpose.
+
+Curves are typically not constructed or used directly, instead being passed to line.curve and area.curve.
+So, this line:
+
+var lineFun = d3.line()
+    .x(function(d){return d.month*50})
+    .y(function(d){return height - (10* d.Sales)})
+    .interpolate("basis")
+Should be this:
+
+var lineFun = d3.line()
+    .x(function(d){return d.month*50})
+    .y(function(d){return height - (10* d.Sales)})
+    .curve(d3.curveBasis);
+*/
+/*
+var svg = 
+    d3.select("body").append("svg").attr("width", w).attr("height", h);
+
+//make a viz, special type of svg that allows us to draw things with data
+//draw any number of things
+//Easiest to draw things that dont have a predefined shape
+//Thats why path is how it draws shape for us. 
+var viz = svg.append("path")
+             .attr("d", lineFun(monthlySales))
+             .attr("stroke", "purple") //colors line
+             .attr("stroke-width", 2)
+             .attr("fill", "none")
+//svg has path, and it has a d operator, whihc has coordinates of line, and 
+//how the line should be drawn, is also written in value of d operator. 
+
+//Lets add some labels:
+
+var labels = svg.selectAll("text").data(monthlySales).enter().append("text")
+            //basically its going to look for all the text objects in svg, 
+            //then it assigns data to those text objects
+            //and if they arent there, it will append them 
+            .text(function(d) {return d.sales})
+            .attr("x", function(d) {return d.month*4 - 25;})
+            .attr("y", function(d){return h- d.sales})
+             .attr("font-family", "sans-serif")   //CSS Properties being added. 
+             .attr("font-size", 12)
+             .attr("fill", "#666666")
+             .attr("text-anchor","start" ) //text anchor is going to tell it where to appear
+             //text anchor looks at where the x and y are and in that space, does it align with 
+             //the left middle or right which is start, middle, end for text-anchor
+             .attr("dy",  ".35em")//set the line height here
+             .attr("font-weight", function(d,i){ //first or last data elemnt are BOLD
+                 if(i==0 || i ==(monthlySales.length-1))
+                    return "bold";
+                else
+                    return "normal";
+             })
+</script>      
+<script>
+//LETS MAKE SCATTER PLOTS!~~~~
+/*
+var h = 350;
+var w = 400;
+
+monthlySales = [
+{"month": 10, "sales": 200},
+{"month": 20, "sales": 15},
+{"month": 30, "sales": 302},
+{"month": 40, "sales": 280},
+{"month": 50, "sales": 25},
+{"month": 60, "sales": 7},
+{"month": 70, "sales": 120},
+{"month": 80, "sales": 230}
+];
+
+var svg = d3.select("body").append("svg").attr("width", w).attr("height", h);
+
+//add dots
+var dots = svg.selectAll("circle")
+              .data(monthlySales)
+              .enter()
+              .append("circle")
+              .attr("cx", function(d) { return d.month*3})
+              .attr("cy", function(d) {return h-d.sales;})
+              .attr("r", 5)
+              .attr("fill", function(d) {return salesKPI(d.sales)})
+
+function salesKPI(d) {
+if(d>=250) 
+    {return "#33CC66";} 
+else 
+    return "#111111"
+}
+
+function showMinMax(ds, col, val, type){ //2 Options, show all labels, or show just min and max
+    var max = d3.max(ds, function(d) {return d[col]; }) ;
+    var min = d3.min(ds, function(d) {return d[col]; });
+
+    if(type=="minmax" && (val == max || val == min)){
+        return val;
+    
+    } else {
+        if(type=="all"){
+            return val;
+        }
+    }
+}
+//Lets set up key performance indicators to color the dots. 
+
+var labels = svg.selectAll("text")
+    .data(monthlySales)
+    .enter()
+    .append("text")
+.text(function (d) {return showMinMax(monthlySales, 'sales', d.sales, "minmax"); })
+ .attr("x", function(d) {return d.month*3 - 25;})
+            .attr("y", function(d){return h- d.sales})
+             .attr("font-family", "sans-serif")   //CSS Properties being added. 
+             .attr("font-size", 12)
+             .attr("fill", "#666666")
+             .attr("text-anchor","start" )
+
+//using showMinMax will make data more interactive and cool
+</script>
+
+<script>
+/*
+    //enter D3 Code here
+    d3.select("body")
+      .append("h1")//Append to h1 tag
+      .text("hello world!");
+</script>
+
+
+<script>
+/*
+    //enter D3 Code here
+    d3.select("body")
+      .append("h1")//Append to h1 tag
+      .text("hello world!");
+</script>
+
+//WOrking with data
+
+<script>
+/*
+    var h=100;
+    var w = 400;
+    var ds; //global variable for csv data set, array of 12 objects, each object has month and sales fields. 
+    var salesTotal = 0.0; //Decimal field 
+    var salesAvg = 0.0;
+    var metrics = []
+
+//This pulls in the CSV data and parses out into a dictionary or objcet for us. 
+//There are also d3.json, d3.text, d3.xhr which all pull in data, 
+
+//make it a function so you can reuse it for other data. 
+
+    function buildLine() {
+             var lineFun = d3.line()
+                    .x(function(d) { return ((d.month - 20130001)/3.25 )})
+                    .y(function(d) {return h-d.sales;})
+                    .curve(d3.curveLinear);
+        //Now create svg
+        var svg = d3.select("body").append("svg").attr("width", w).attr("height", h)
+        //Make line chart by mkaing new once called viz
+
+        var viz = svg.append("path")
+                      .attr("d", lineFun(ds))
+                      .attr("stroke", "purple")
+                      .attr("stroke-width", 2)
+                      .attr("fill", "none")
+    }
+
+    //This function also shows average/ 
+    function showTotals() {
+        var t = d3.select("body").append("table");
+        //get total
+        for(var i = 0; i < ds.length; i++){
+            salesTotal += ds[i]['sales']*1; //multiplying by 1 converts to number
+        }
+
+        salesAvg = salesTotal /ds.length;
+
+        //add metrics to array
+
+        metrics.push("Sales Total: " + salesTotal);
+        metrics.push("Sales Avg: " + salesAvg.toFixed(2)) //chops to two decimal places
+
+        //add total to table
+        var tr = t.selectAll("tr")
+                  .data(metrics)
+                  .enter()
+                  .append("tr")
+                  .append("td")
+                  .text(function(d) {
+                    return d; 
+                  })//text of td
+    }
+
+    d3.csv("../MonthlySales.csv", function(error, data) { //This is going to run asynchronously with any other functions 
+        if(error){
+            console.log(error);
+        } else {
+            console.log(data); //Have data, we are golden. 
+            ds=data;
+        }
+        
+        //since it runs asynchronously lets firts write some code to draw visualization then call it from the async.
+
+        buildLine();
+        showTotals(); //Builds a single row and a single cell with the sales total. Also shows average. 
+   
+
+    });   
+*/
+
+</script>
+
+
+
+<script>
+/*
+    var h=100;
+    var w = 400;
+
+//This pulls in the CSV data and parses out into a dictionary or objcet for us. 
+//There are also d3.json, d3.text, d3.xhr which all pull in data, 
+
+//make it a function so you can reuse it for other data. 
+
+    function buildLine(ds) {
+             var lineFun = d3.line()
+                    .x(function(d) { return ((d.month - 20130001)/3.25 )})
+                    .y(function(d) {return h-d.sales;})
+                    .curve(d3.curveLinear);
+        //Now create svg
+        var svg = d3.select("body").append("svg").attr("width", w).attr("height", h)
+        //Make line chart by mkaing new once called viz
+     
+        var viz = svg.append("path")
+                      .attr("d", lineFun(ds.monthlySales)) //HAVE TO CALL IT WITH MONTHLY SALES NOW. 
+                      .attr("stroke", "purple")
+                      .attr("stroke-width", 2)
+                      .attr("fill", "none")
+    }
+
+    function showHeader(ds) {
+        d3.select("body").append("h1").text(ds.category + " Sales(2013)")
+    }
+
+    //Nothing changed in code except we changed from .csv to .json
+    
+    //Once we get the data in, and its treated like an object or an array, because itll all be treated
+    //the same after that. 
+    //Lets show header information too~!!
+    //WE CAN JUST KEEP THIS AS .JSON because data being returned is json. So just put the endpoint and see what happens. 
+    d3.json("https://api.github.com/repos/bsullins/d3js-resources/contents/monthlySalesbyCategoryMultiple.json", function(error, data) { //Change from .csv to .json
+        if(error){
+            console.log(error);
+        } else {
+            console.log(data); //Have data, we are golden. 
+            ds=data;
+        }
+        
+//A common use of JSON is to exchange data to/from a web server.
+//When receiving data from a web server, the data is always a string.
+//Parse the data with JSON.parse(), and the data becomes a JavaScript object.
+
+        var decodedData = JSON.parse(window.atob(data.content));
+        
+        decodedData.contents.forEach(function(ds){
+        console.log(ds)
+        showHeader(ds);
+        buildLine(ds);
+        });
+
+    });   
+
+
+</script>
+
+
+  <style>
+        .axis path, 
+        .axis line {
+            fill: none
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+
+        .axis text {
+            font-family: sans-serif;
+            font-size: 10px;
+        }
+
+        h1 {
+            font-family: sans-serif;
+            font-weight: 300;
+            font-size: 16px
+        }
+
+
+    </style>
+    
+    <script>
+/*
+    var h=100;
+    var w = 300;
+    var padding = 20;
+
+    //NEED THIS FOR X AXIS
+    function getDate(d){
+        //d looks like 20130101 which is 2013/01/01
+        var strDate = new String(d); //Creates a new string object. 
+
+        var year = strDate.substring(0, 4);
+        var month = strDate.substring(4, 6) - 1; //(So 0 is jan, 1 is feb)
+        var day = strDate.substring(6,9);
+        return new Date(year, month, day);
+    }
+
+    function buildLine(ds) {
+
+        var minDate = getDate(ds.monthlySales[0]['month']);
+        var maxDate = getDate(ds.monthlySales[ds.monthlySales.length-1]['month']);
+
+        //////////////////////////////////////////////// WE HAVE TO CHANGE the xSCALE BECAUSE IT REPRESENTS A DATE.
+        var xScale = d3.scaleTime() /////////////CHANGE FROM .scaleLinear() to .scaleTime()
+                             .domain([minDate, maxDate])                                    //CHANGED A LINE HERE
+                             .range([padding + 5, w-padding]);                                                    
+                             //The range is 0 to w which means its takes space for entire svg. 
+                             //What we want it to do is start with padding and end with w-padding. 
+                            
+                             
+                              
+                            console.log("The max is: " + d3.max(ds.monthlySales, function(d){ return d.sales;}) )   
+
+      var yScale = d3.scaleLinear()
+                            .domain([
+                                0, 80
+                            ])
+                            .range([h-padding, 10])       //CHANGED A LINE HERE
+                            .nice(); //This roungs things                                                                  
+                             //The range is h to 0 which means its takes space for entire svg. 
+                             //What we want it to do is leave some space. 
+
+
+        //ADDING AXIS NOW, X AXIS MIGHT BE HARDER CAUSE ITS DATES RATHER THAN NUMBERS:
+        //ON X AXIS FORMAT THE TICKS BY using tickFormat, and then use time function in D3
+        var xAxisGen = d3.axisBottom().scale(xScale).tickFormat(d3.timeFormat("%b")); //%b is shortened Month name. 
+        var yAxisGen = d3.axisLeft().scale(yScale)         //ADDED THIS LINE
+        
+        //WE SPECIFIED TICKS WHICH MEANS THEYLL BE 4 TICKS. if we dint specify it would put default number of ticks. 
+
+             var lineFun = d3.line()
+                    .x(function(d) { return xScale(getDate(d.month)); }) //////////////////ADD GET DATE HERE
+                    .y(function(d) { return yScale(d.sales); })
+                    .curve(d3.curveLinear);
+                    
+        var svg = d3.select("body").append("svg").attr("width", w).attr("height", h)
+  
+        //g is a group in a svg that allows us to put all this stuff together, and its kind of like a div tag. 
+        //useful for axis because the axis actually generates a whole lot of stuff when it gets rendered 
+        var yAxis = svg.append("g").call(yAxisGen) //when you say append("g"), 
+                            .attr("class", "axis") //add css class attribute
+                            .attr("transform", "translate(" +  padding + ", 0)"); //These functions allow us to dynamically move things inside our svg. 
+                                                                                //So this will pad the axis to the left. So we can see it. 
+     var xAxis = svg.append("g").call(xAxisGen)
+                        .attr("class", "axis")
+                        .attr("transform", "translate(0, " + (h-padding) + ")"); //We are translating it down. 
+                         //if you dont translate it down, it will be at the top of the graph.  
+
+     
+        var viz = svg.append("path")
+                      .attr("d", lineFun(ds.monthlySales)) //HAVE TO CALL IT WITH MONTHLY SALES NOW. 
+                      .attr("stroke", "purple")
+                      .attr("stroke-width", 2)
+                      .attr("fill", "none")
+    }
+
+    function showHeader(ds) {
+        d3.select("body").append("h1").text(ds.category + " Sales(2013)")
+    }
+
+    d3.json("https://api.github.com/repos/bsullins/d3js-resources/contents/monthlySalesbyCategoryMultiple.json", function(error, data) { //Change from .csv to .json
+        if(error){
+            console.log(error);
+        } else {
+            console.log(data); //Have data, we are golden. 
+            ds=data;
+        }
+
+        var decodedData = JSON.parse(window.atob(data.content));
+        
+        decodedData.contents.forEach(function(ds){
+        console.log(ds)
+        showHeader(ds);
+        buildLine(ds);
+        });
+
+    });   
+
+</script>
+
+
+<!--
+    <label>Show Labels </label>
+    <select id="label-option">
+        <option value="all"> All</option>
+        <option value="minmax"> Min/Max</option>
+        <option value="none"> None </option>
+    </select>
+-->
+
+
+<script> 
+/*
+var h = 350;
+var w = 400;
+
+monthlySales = [
+     {"month":10, "sales":100},
+     {"month":20, "sales":130},
+     {"month":30, "sales":250},
+     {"month":40, "sales":300},
+     {"month":50, "sales":265},
+     {"month":60, "sales":225},
+     {"month":70, "sales":180},
+     {"month":80, "sales":120},
+     {"month":90, "sales":145},
+     {"month":100, "sales":130}
+];
+
+//KPI color
+function salesKPI (d) {
+  if (d>=250) { return "#33CC66"; } else
+  if (d<250) { return "#666666"; }
+}
+
+//create our SVG
+var svg = d3.select("body").append("svg").attr("width",w).attr("height", h);
+
+//add min/max to array
+Array.max = function( array ){
+  return Math.max.apply( Math, array );
+};
+    
+Array.min = function( array ){
+  return Math.min.apply( Math, array );
+};
+
+//function for showing labels
+function showMinMax(ds, col, val, type){
+  var max = d3.max(ds, function(d) { return d[col]; } );
+  var min = d3.min(ds, function(d) { return d[col]; } );
+ 
+  if (type=='minmax' && (val == max || val == min)) {
+    return val;
+  } else
+   
+  if (type=='all') {
+    return val;
+  } 
+ 
+}
+//add dots
+var dots = svg.selectAll("circle")
+  .data(monthlySales)
+  .enter()
+  .append("circle")
+  .attr( "cx", function(d){ return d.month*3; } )
+  .attr( "cy", function(d){ return h-d.sales; } )
+  .attr("r",  5 )
+  .attr("fill", function(d){ return salesKPI(d.sales); } );
+
+var labels = svg.selectAll("text")
+  .data(monthlySales)
+  .enter()
+  .append("text")
+  .text(function(d){ return showMinMax(monthlySales, 'sales', d.sales, 'minmax'); })
+  .attr("x", function(d){ return (d.month*3)-25; })
+  .attr(  "y", function(d){ return h-d.sales; })
+  .attr(  "font-size", "12px")
+  .attr(  "font-family", "sans-serif")
+  .attr(  "fill", "#666666")
+  .attr(  "text-anchor", "start");
+
+
+///////ADDDEDED AN EVENT LISTENER RIGHT HERE. 
+
+d3.select("select")//selects the select object we just created in the body tag. 
+   .on("change", function(d) { //d is the index of the selection .
+     
+       var sel= d3.select("#label-option")
+                  .node() //Gets the selected node(all, none, minmax)
+                  .value; //This is the id of our select object. 
+
+       svg.selectAll("text")
+       //Select all text like we are drawing something but not including enter, or append since i want to change an existing value.
+          .data(monthlySales) //so im only going to add those operators that i want to change when this event occurs. 
+          .text(function(d) { return showMinMax(monthlySales, 'sales', d.sales, sel); })
+
+   });
+
+
+
+</script>
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+<style>
+        .x-axis path, .y-axis path 
+        .x-axis line, .y-axis line {
+            fill: none
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+
+        .x-axis text, .y-axis text {
+            font-family: sans-serif;
+            font-size: 10px;
+        }
+
+        h1 {
+            font-family: sans-serif;
+            font-weight: 300;
+            font-size: 16px
+        }
+        
+        div.tooltip {
+            position: absolute;
+            max-width:200px;
+            height:auto;
+            padding:5px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+            pointer-events: none; /*VERY IMPORTANT, elemnt should take over pointer events, hover off of tooltip on page, then it shud stop*/
+            font-family:sans-serif;
+            font-size: 12px;
+        }
+
+</style>
+
+<p>Choose Data Range
+  <select id="data-option">
+    <option value="12">Last Year</option>
+    <option value="6">Last 6 months</option>
+    <option value="3">Last quarter</option>
+  </select>
+</p>
+    
+    <script>
+    /*
+//WANT TO BE ABLE TO PUT POINTER ON LINE CHART THEN SEE TOOLTIP FOR THAT POINT
+    var h=100;
+    var w = 300;
+    var padding = 20;
+
+    function getDate(d){
+        var strDate = new String(d); 
+        var year = strDate.substring(0, 4);
+        var month = strDate.substring(4, 6) - 1; 
+        var day = strDate.substring(6,9);
+        return new Date(year, month, day);
+    }
+
+    function buildLine(ds) {
+
+        var minDate = getDate(ds.monthlySales[0]['month']);
+        var maxDate = getDate(ds.monthlySales[ds.monthlySales.length-1]['month']);
+
+        //add tooltip, opacity 0 so you wont see it to start. 
+        var tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0); 
+
+
+
+        var xScale = d3.scaleTime() 
+                             .domain([minDate, maxDate])                                    
+                             .range([padding + 5, w-padding]);                                                    
+                            
+      var yScale = d3.scaleLinear()
+                            .domain([
+                                0, 80
+                            ])
+                            .range([h-padding, 10])       
+                            .nice();                                                                
+                      
+        var xAxisGen = d3.axisBottom().scale(xScale).tickFormat(d3.timeFormat("%b")); 
+        var yAxisGen = d3.axisLeft().scale(yScale)        
+
+        var lineFun = d3.line()
+                    .x(function(d) { return xScale(getDate(d.month)); }) 
+                    .y(function(d) { return yScale(d.sales); })
+                    .curve(d3.curveLinear);
+          
+        var svg = d3.select("body").append("svg").attr("width", w)
+                                                 .attr("height", h)
+                                                 .attr("id", "svg-"+ds.category)
+        
+        var yAxis = svg.append("g").call(yAxisGen) 
+                            .attr("class", "y-axis")                     
+                            .attr("transform", "translate(" +  padding + ", 0)"); 
+                                                                                
+       var xAxis = svg.append("g").call(xAxisGen)
+                         .attr("class", "x-axis")   
+                        .attr("transform", "translate(0, " + (h-padding) + ")"); 
+
+        //ADD AN ATTRIBUTE CLASS TO PATH ASWELL.
+        var viz = svg.append("path")
+                      .attr("d", lineFun(ds.monthlySales)) 
+                      .attr("stroke", "purple")
+                      .attr("stroke-width", 2)
+                      .attr("fill", "none")
+                      .attr("class", "path-"+ds.category)
+
+        //Adds dots on the line chart for greater clarity.
+        //They can land their mouse on this for the tooltip
+        //add event listener for cool stuff
+        var dots = svg.selectAll("circle")
+        .data(ds.monthlySales)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d){return xScale(getDate(d.month));})
+        .attr("cy", function(d){return yScale(d.sales); })
+        .attr("r", 4)
+        .attr("fill","#666666")
+        .attr("class", "circle-"+ds.category)
+        .on("mouseover", function(d){
+            tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0.85)
+            tooltip.html("<strong>Sales $" + d.sales + "K</strong>")
+            //WHEN YOU ARE INSIDE OF A D3 EVENT YOU GET THE EVENTS PROPERTIES LIKE SO,
+            //SO IN THIS CASE ITS THE MOUSE OVER EVENT, THE CURRENT POSITION OF THE CURSOR
+            //FROM WHERE IT GETS THE VALUES. 
+                .style("left", d3.event.pageX + "px")
+                .style("top", (d3.event.pageY-28) + "px"); 
+        })
+        .on("mouseout", function(d){
+            tooltip.transition()
+                    .duration(300)
+                    .ease(d3.easeLinear)
+                    .style("opacity", 0);
+        })   
+    }
+
+    function updateLine(ds) {
+
+        var minDate = getDate(ds.monthlySales[0]['month']);
+        var maxDate = getDate(ds.monthlySales[ds.monthlySales.length-1]['month']);
+
+        var xScale = d3.scaleTime() 
+                             .domain([minDate, maxDate])                                    
+                             .range([padding + 5, w-padding]);                                                    
+                            
+      var yScale = d3.scaleLinear()
+                            .domain([
+                                0, 80
+                            ])
+                            .range([h-padding, 10])       
+                            .nice();                                                                
+                      
+        var xAxisGen = d3.axisBottom()
+                         .scale(xScale)
+                         .tickFormat(d3.timeFormat("%b"))
+                         .ticks(ds.monthlySales.length-1);  
+
+        var yAxisGen = d3.axisLeft()
+                         .scale(yScale)        
+                         .ticks(4);
+
+        var lineFun = d3.line()
+                    .x(function(d) { return xScale(getDate(d.month)); }) 
+                    .y(function(d) { return yScale(d.sales); })
+                    .curve(d3.curveLinear);
+      
+        var svg = d3.select("body")
+                    .select("#svg-"+ ds.category)
+                    .attr("width", w).attr("height", h)
+      
+
+        var yAxis = svg.selectAll("g.y-axis").call(yAxisGen)  
+                            
+                        
+                                                                                
+       var xAxis = svg.selectAll("g.x-axis").call(xAxisGen)
+             
+        var viz = svg.selectAll(".path-"+ds.category)
+                     .transition() 
+                     .delay(20)
+                     .duration(500)
+                      .ease(d3.easeLinear)
+                      .attr("d", lineFun(ds.monthlySales))
+
+     var dots = svg.selectAll(".circle-"+ds.category)
+     .transition()
+     .duration(500)
+     .ease(d3.easeBounce)
+        .attr("cx", function(d){return xScale(getDate(d.month));})
+        .attr("cy", function(d){return yScale(d.sales); })
+
+    }
+
+
+    function showHeader(ds) {
+        d3.select("body").append("h1").text(ds.category + " Sales(2013)")
+    }
+
+    d3.json("https://api.github.com/repos/bsullins/d3js-resources/contents/monthlySalesbyCategoryMultiple.json", function(error, data) { 
+        if(error){
+            console.log(error);
+        } else {
+            console.log(data); 
+            ds=data;
+        }
+
+        var decodedData = JSON.parse(window.atob(data.content));
+        
+        decodedData.contents.forEach(function(ds){
+        console.log(ds)
+        showHeader(ds);
+        buildLine(ds);
+        });
+
+        d3.select("select")
+           .on("change", function(d,i){
+               var sel = d3.select("#data-option").node().value;
+
+               var decodedData = JSON.parse(window.atob(data.content));
+               decodedData.contents.forEach(function(ds){ //filtering
+                   ds.monthlySales.splice(0, ds.monthlySales.length-sel) 
+
+                   updateLine(ds);
+               })
+
+    });   
+    })
+
+</script>
+
+<script>
+/*
+//adding tooltips now
+var w = 300;
+var h = 100; 
+var padding = 2; 
+var dataset = [5,10,15,20, 25, 11, 25, 22, 18 ,7];
+
+barHeightExpansionFactor = 4;
+
+function colorPicker(v){
+    if (v<= 20) {return "#666666";}
+    else if (v>20) {return "#FF0033"}
+}
+
+var svg = d3.select("body").append("svg")
+            .attr("width", w)
+            .attr("height", h)
+
+svg.selectAll('rect')
+   .data(dataset)
+   .enter()
+   .append("rect")
+          .attr("x", function(d, i ){
+              return i * (w/dataset.length);
+          })
+          .attr("y", function(d){
+             return h - (d * barHeightExpansionFactor );
+
+              
+          })
+         .attr("width", w/dataset.length - padding)
+         .attr("height", function(d) {return d*barHeightExpansionFactor  })     
+         .attr("fill", function(d){
+             return "rgb(" + (d*10)+ ", 0, 0)";
+         })
+         .append("title") 
+         .text(function(d) {return d;});
+</script>
+<script>  
+
+//ADDING TOOLTIP PART TO, EVENT LISTENER ON RECT
+/*
+var w = 300;
+var h = 100; 
+
+var padding = 2; //Spacing between the bars. 
+var dataset = [5,10,15,20, 25, 11, 25, 22, 18 ,7];
+
+barHeightExpansionFactor = 4;
+
+function colorPicker(v){
+    if (v<= 20) {return "#666666";}
+    else if (v>20) {return "#FF0033"}
+}
+
+var svg = d3.select("body").append("svg")
+            .attr("width", w)
+            .attr("height", h)
+
+svg.selectAll('rect')
+   .data(dataset)
+   .enter()
+   .append("rect")
+          .attr("x", function(d, i ){
+              return i * (w/dataset.length);
+          })
+          .attr("y", function(d){
+
+             return h - (d * barHeightExpansionFactor );
+
+              
+          })
+         .attr("width", w/dataset.length - padding)
+         .attr("height", function(d) {return d*barHeightExpansionFactor  })     
+         .attr("fill", function(d){
+             return "rgb(" + (d*10)+ ", 0, 0)";
+         })
+         .on("mouseover", function(d){ //MOUSEOVER TO ADD THE TEXT,
+            svg.append("text")
+               .text(d)
+                .attr("text-anchor", "middle")
+                .attr("x", parseFloat(d3.select(this).attr("x")) + parseFloat(d3.select(this).attr("width")/2) ) //REFERENCED THE PARENT D3 OBJECT HERE
+                .attr("y",  parseFloat(d3.select(this).attr("y")) + 12) //ParseFloat converts string to number
+                .attr("font-family", "sans-serif")   //CSS Properties being added. 
+                .attr("font-size", 12)
+                .attr("fill", "#ffffff")
+                .attr("id", "tooltip")
+       })
+       .on("mouseout", function(){
+           d3.select("#tooltip").remove();
+       });
+
+
+
+       
+</script>
+
+<script>
+              //Width and height
+            var w = 500;
+            var h = 300;
+            
+            //Drawing these shapes but outside svg window. Need to scale them
+                   //so designs fit 
+                   //Needs to fit withing someting that we want to see
+                   //Way maps get scaled is called a projection
+                   //Create a new function called projection
+                   //Then use albersUsa as default projection for D3,
+                   //Translate this projection, and scale to 500. 
+                   //then called .projection on path
+                   //Need to add color. Called a chloropleth, ues color to draw different shapes
+                   //Using color a bt too much might be bad. 
+                   //How to color something => sales by state, 
+                   //Have a csv for thus,
+                   //Lets also add points on the map, larger the sale, bigger the bubble. 
+                   /*
+                   state,sales
+Alabama,305010.8395
+Arizona,249113.82
+Arkansas,223888.0825
+California,1372210.208
+Colorado,323632.227
+Connecticut,102924.0675
+Delaware,10925.658
+
+//SALES BY CITY WHICH REPRESENT THE DOTS ON THE MAP:
+
+rank,sales,zip,lat,lon,city,state
+1,103078.762,94110,37.74873,-122.41545,San Francisco,CA
+2,97011.194,35756,34.630103,-86.80159,Madison,AL
+3,62018.162,23111,37.605641,-77.31536,Mechanicsville,VA
+4,52583.67,11720,40.868946,-73.08009,Centereach,NY
+5,51917.85,27502,35.73663,-78.86462,Apex,NC
+6,51081.3165,72143,35.239022,-91.73776,Searcy,AR
+7,49926.7,11010,40.701702,-73.67562,Franklin Square,NY
+8,49206.5345,94025,37.451688,-122.18385,Menlo Park,CA
+9,48369.278,44240,41.148756,-81.35302,Kent,OH
+
+We want to color map using data, need to join these 2 data sets together. 
+
+                   */
+            //Define map projection
+            var projection = d3.geoAlbersUsa()
+                                   .translate([w/2, h/2])
+                                   .scale(500);
+
+            //Define path generator
+            var path = d3.geoPath()
+                             .projection(projection);
+
+            //Create SVG element
+            var svg = d3.select("body").append("svg").attr("width",w).attr("height",h);
+            
+            //got codes from colorbrewer.com
+            var color = d3.scaleLinear().range(
+                ['rgb(254,240,217)','rgb(253,212,158)','rgb(253,187,132)','rgb(252,141,89)','rgb(227,74,51)','rgb(179,0,0)'])
+
+            
+d3.csv("state-sales.csv", function(data){
+
+    color.domain([0, d3.max(data, function(d){return d.sales})]);
+
+            //Load in GeoJSON data
+            d3.json("us.json", function(json) {
+                
+                //join data togethoer
+                for(var i = 0; i<data.length; i++){
+                    var salesState = data[i].state; //State for this row we are parsing
+                    var salesVal = parseFloat(data[i].sales);
+
+                    for(var j=0; j < json.features.length; j++){
+                        var usState = json.features[j].properties.NAME;
+                        if(salesState == usState){
+                            //THEN ADD TO JSON, A VLAUE PROPERTY
+                            json.features[j].properties.value = salesVal;
+                            break;
+                        }
+                    }
+                }        
+
+                //Bind data and create one path per GeoJSON feature
+                svg.selectAll("path")
+                   .data(json.features)
+                   .enter()
+                   .append("path")
+                   .attr("d", path)
+                  // .attr("fill","#666666");
+                  .style("fill", function(d) {
+                      var value = d.properties.value;
+                      if(value){
+                          return color(value)
+                      } else {
+                          return "#666666"
+                      }
+                    });
+            });
+        })
+            /*
+            Plotting poitns with this code doesnt work because
+             return projection([d.lon, d.lat])[1]; => doesnt work
+
+            debugger;
+            //Load in cities data
+              d3.csv("sales-by-city.csv", function(data) {
+                
+                svg.selectAll("circle")
+                   .data(data)
+                   .enter()
+                   .append("circle")
+                   .attr("cx", function(d) {
+                     return projection([d.lon, d.lat])[0];
+                   })
+                   .attr("cy", function(d) {
+                     return projection([d.lon, d.lat])[1];
+                   })
+                   .attr("r", function(d) {
+                    return Math.sqrt(parseInt(d.sales)* 0.00005);
+                   })
+                   .style("fill", "red");
+                
+              });
+              */
+
+</script>
+
+
+
+
+  </body>
+</html>
